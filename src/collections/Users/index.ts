@@ -6,7 +6,7 @@ export const Users: CollectionConfig = {
   slug: 'users',
   access: {
     admin: authenticated,
-    create: authenticated,
+    create: () => process.env.NODE_ENV === 'development',
     delete: authenticated,
     read: authenticated,
     update: authenticated,
