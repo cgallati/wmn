@@ -24,8 +24,8 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data: _data }) => {
   return (
     <header className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 z-50">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          <Link href="/" className="text-2xl font-light text-black">
+        <div className="flex items-center justify-between h-20">
+          <Link href="/" className="text-4xl font-light text-black">
             WMN
           </Link>
           
@@ -34,7 +34,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data: _data }) => {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`text-sm font-medium transition-colors ${
+                className={`text-base font-medium transition-colors ${
                   pathname === item.href
                     ? 'text-black border-b-2 border-black pb-1'
                     : 'text-gray-600 hover:text-black'
@@ -47,7 +47,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data: _data }) => {
               href="/shop/cart"
               className="flex items-center gap-2 text-gray-600 hover:text-black transition-colors"
             >
-              <ShoppingCart className="w-4 h-4" />
+              <ShoppingCart className="w-5 h-5" />
               {totalItems > 0 && (
                 <span className="bg-black text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                   {totalItems}
@@ -62,7 +62,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data: _data }) => {
               href="/shop/cart"
               className="flex items-center gap-2 text-gray-600 hover:text-black transition-colors"
             >
-              <ShoppingCart className="w-4 h-4" />
+              <ShoppingCart className="w-5 h-5" />
               {totalItems > 0 && (
                 <span className="bg-black text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                   {totalItems}
@@ -79,7 +79,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data: _data }) => {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`text-sm font-medium transition-colors ${
+                className={`text-base font-medium transition-colors ${
                   pathname === item.href
                     ? 'text-black'
                     : 'text-gray-600 hover:text-black'
