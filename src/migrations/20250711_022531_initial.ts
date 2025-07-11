@@ -1,6 +1,6 @@
 import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-sqlite'
 
-export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
+export async function up({ db }: MigrateUpArgs): Promise<void> {
   await db.run(sql`CREATE TABLE \`artwork\` (
   	\`id\` integer PRIMARY KEY NOT NULL,
   	\`title\` text,
@@ -1244,7 +1244,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   await db.run(sql`CREATE INDEX \`footer_rels_posts_id_idx\` ON \`footer_rels\` (\`posts_id\`);`)
 }
 
-export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
+export async function down({ db }: MigrateDownArgs): Promise<void> {
   await db.run(sql`DROP TABLE \`artwork\`;`)
   await db.run(sql`DROP TABLE \`_artwork_v\`;`)
   await db.run(sql`DROP TABLE \`products\`;`)

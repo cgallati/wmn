@@ -28,9 +28,9 @@ export async function POST(request: NextRequest) {
       case 'checkout.session.completed':
         const session = event.data.object as Stripe.Checkout.Session
 
-        // Get session with line items
-        const _sessionWithItems = await stripe.checkout.sessions.retrieve(session.id, {
-          expand: ['line_items'],
+        // Get session with line items and shipping details
+        const sessionWithDetails = await stripe.checkout.sessions.retrieve(session.id, {
+          expand: ['line_items', 'shipping_details'],
         })
 
         // Parse order items from metadata
@@ -48,12 +48,12 @@ export async function POST(request: NextRequest) {
               phone: session.metadata?.customerPhone || session.customer_details?.phone || '',
             },
             shipping: {
-              address1: (session as any).shipping_details?.address?.line1 || '',
-              address2: (session as any).shipping_details?.address?.line2 || '',
-              city: (session as any).shipping_details?.address?.city || '',
-              state: (session as any).shipping_details?.address?.state || '',
-              zipCode: (session as any).shipping_details?.address?.postal_code || '',
-              country: (session as any).shipping_details?.address?.country || '',
+              address1: (sessionWithDetails as any).shipping_details?.address?.line1 || '',
+              address2: (sessionWithDetails as any).shipping_details?.address?.line2 || '',
+              city: (sessionWithDetails as any).shipping_details?.address?.city || '',
+              state: (sessionWithDetails as any).shipping_details?.address?.state || '',
+              zipCode: (sessionWithDetails as any).shipping_details?.address?.postal_code || '',
+              country: (sessionWithDetails as any).shipping_details?.address?.country || '',
             },
             items: orderItems.map((item: { productId: string; quantity: number; price: number }) => ({
               product: item.productId,
