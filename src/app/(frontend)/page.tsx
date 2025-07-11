@@ -1,5 +1,32 @@
-import PageTemplate, { generateMetadata } from './[slug]/page'
+import { Metadata } from 'next'
+import { getPayload } from 'payload'
+import config from '@payload-config'
+import { Portfolio } from '@/components/Portfolio'
 
-export default PageTemplate
+export const metadata: Metadata = {
+  title: 'Portfolio | WMN Photo',
+  description: 'A curated collection of photographic work by WMN',
+  openGraph: {
+    title: 'Portfolio | WMN Photo',
+    description: 'A curated collection of photographic work by WMN',
+    siteName: 'WMN Photo',
+    type: 'website',
+  },
+}
 
-export { generateMetadata }
+export default async function HomePage() {
+  const payload = await getPayload({ config })
+
+  const artwork = await payload.find({
+    collection: 'artwork',
+    where: {
+      _status: {
+        equals: 'published',
+      },
+    },
+    sort: '-publishedAt',
+    limit: 50,
+  })
+
+  return <Portfolio artwork={artwork.docs} />
+}

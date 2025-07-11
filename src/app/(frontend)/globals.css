@@ -89,7 +89,22 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground min-h-[100vh] flex flex-col;
+    @apply bg-white text-black min-h-[100vh] flex flex-col font-light;
+  }
+  
+  /* Typography for photographer aesthetic */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-light text-black;
+  }
+  
+  /* Minimal form styling */
+  input, textarea, select {
+    @apply border-gray-300 focus:border-black focus:ring-black;
+  }
+  
+  /* Button styling */
+  button {
+    @apply transition-all duration-200;
   }
 }
 

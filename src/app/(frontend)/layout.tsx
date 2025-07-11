@@ -35,7 +35,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           />
 
           <Header />
-          {children}
+          <main className="pt-16 min-h-screen">
+            {children}
+          </main>
           <Footer />
         </Providers>
       </body>
@@ -45,9 +47,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
 export const metadata: Metadata = {
   metadataBase: new URL(getServerSideURL()),
-  openGraph: mergeOpenGraph(),
+  title: 'WMN Photo',
+  description: 'Fine art photography by WMN',
+  openGraph: mergeOpenGraph({
+    title: 'WMN Photo',
+    description: 'Fine art photography by WMN',
+    siteName: 'WMN Photo',
+    type: 'website',
+  }),
   twitter: {
     card: 'summary_large_image',
-    creator: '@payloadcms',
+    title: 'WMN Photo',
+    description: 'Fine art photography by WMN',
   },
 }
