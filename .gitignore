@@ -6,6 +6,11 @@ node_modules
 .next
 .vercel
 
+# Local SQLite database files
+dev.db
+dev.db-wal
+dev.db-shm
+
 # Payload default media upload directory
 public/media/
 

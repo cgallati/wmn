@@ -64,26 +64,37 @@ export default buildConfig({
   },
   // This config helps us configure global or default features that the other editors can inherit
   editor: defaultLexical,
-  db: sqliteAdapter({
-    client: {
-      url: process.env.DATABASE_URI || '',
-      authToken: process.env.DATABASE_AUTH_TOKEN || '',
-    },
-  }),
+  db: sqliteAdapter(
+    process.env.USE_LOCAL_DB === 'true'
+      ? {
+          client: {
+            url: 'file:./dev.db',
+          },
+        }
+      : {
+          client: {
+            url: process.env.DATABASE_URI || '',
+            authToken: process.env.DATABASE_AUTH_TOKEN || '',
+          },
+        }
+  ),
   collections: [Artwork, Products, Orders, Bookings, Pages, Posts, Media, Categories, Users],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
   plugins: [
     ...plugins,
     // storage-adapter-placeholder
-    vercelBlobStorage({
-      enabled: true,
-      collections: {
-        media: true,
-      },
-      token: process.env.BLOB_READ_WRITE_TOKEN || '',
-      clientUploads: true, // Bypass Vercel's 4.5MB server upload limit
-    }),
+    ...(process.env.USE_LOCAL_STORAGE === 'true' 
+      ? [] 
+      : [vercelBlobStorage({
+          enabled: true,
+          collections: {
+            media: true,
+          },
+          token: process.env.BLOB_READ_WRITE_TOKEN || '',
+          clientUploads: true, // Bypass Vercel's 4.5MB server upload limit
+        })]
+    ),
   ],
   secret: process.env.PAYLOAD_SECRET,
   sharp,
