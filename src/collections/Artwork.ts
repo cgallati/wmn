@@ -3,6 +3,7 @@ import { authenticated } from '../access/authenticated'
 import { slugField } from '../fields/slug'
 import { populatePublishedAt } from '../hooks/populatePublishedAt'
 import { generatePreviewPath } from '../utilities/generatePreviewPath'
+import { revalidate, revalidateDelete } from '../hooks/revalidate'
 
 export const Artwork: CollectionConfig = {
   slug: 'artwork',
@@ -127,6 +128,8 @@ export const Artwork: CollectionConfig = {
   ],
   hooks: {
     beforeChange: [populatePublishedAt],
+    afterChange: [revalidate],
+    afterDelete: [revalidateDelete],
   },
   versions: {
     drafts: {
