@@ -10,7 +10,7 @@ export const Bookings: CollectionConfig = {
     update: authenticated,
   },
   admin: {
-    defaultColumns: ['name', 'email', 'eventType', 'eventDate', 'status', 'createdAt'],
+    defaultColumns: ['name', 'email', 'serviceType', 'status', 'createdAt'],
     useAsTitle: 'name',
   },
   fields: [
@@ -29,85 +29,84 @@ export const Bookings: CollectionConfig = {
       type: 'text',
     },
     {
-      name: 'eventType',
+      name: 'serviceType',
       type: 'select',
       options: [
-        { label: 'Wedding', value: 'wedding' },
-        { label: 'Engagement', value: 'engagement' },
-        { label: 'Portrait', value: 'portrait' },
-        { label: 'Family', value: 'family' },
-        { label: 'Corporate', value: 'corporate' },
-        { label: 'Event', value: 'event' },
-        { label: 'Other', value: 'other' },
+        { label: 'Photography Session', value: 'session' },
+        { label: 'Brand Campaign', value: 'brand-campaign' },
+        { label: 'Creative Direction', value: 'creative-direction' },
       ],
       required: true,
     },
     {
-      name: 'eventDate',
+      name: 'company',
+      type: 'text',
+      admin: {
+        condition: (data) => data?.serviceType !== 'session',
+      },
+    },
+    {
+      name: 'industry',
+      type: 'text',
+      admin: {
+        condition: (data) => data?.serviceType !== 'session',
+      },
+    },
+    {
+      name: 'preferredDate',
       type: 'date',
       admin: {
         date: {
           pickerAppearance: 'dayOnly',
         },
+        description: 'Preferred start date or event date',
       },
     },
     {
-      name: 'eventTime',
-      type: 'text',
+      name: 'startDate',
+      type: 'date',
       admin: {
-        description: 'Preferred time for the event',
+        date: {
+          pickerAppearance: 'dayOnly',
+        },
+        description: 'Ideal start date for partnership',
+        condition: (data) => data?.serviceType === 'creative-direction',
       },
     },
     {
       name: 'location',
       type: 'text',
       admin: {
-        description: 'Event location or preferred location',
-      },
-    },
-    {
-      name: 'guestCount',
-      type: 'number',
-      admin: {
-        description: 'Approximate number of guests/participants',
+        description: 'Venue, studio, or general area',
       },
     },
     {
       name: 'duration',
-      type: 'select',
-      options: [
-        { label: '1 hour', value: '1-hour' },
-        { label: '2 hours', value: '2-hours' },
-        { label: '3 hours', value: '3-hours' },
-        { label: '4 hours', value: '4-hours' },
-        { label: '6 hours', value: '6-hours' },
-        { label: '8 hours', value: '8-hours' },
-        { label: 'Full day', value: 'full-day' },
-        { label: 'Multiple days', value: 'multiple-days' },
-      ],
+      type: 'text',
+      admin: {
+        description: 'Session duration, project timeline, or partnership type',
+      },
     },
     {
       name: 'budget',
-      type: 'select',
-      options: [
-        { label: 'Under $500', value: 'under-500' },
-        { label: '$500 - $1,000', value: '500-1000' },
-        { label: '$1,000 - $2,500', value: '1000-2500' },
-        { label: '$2,500 - $5,000', value: '2500-5000' },
-        { label: '$5,000 - $10,000', value: '5000-10000' },
-        { label: 'Over $10,000', value: 'over-10000' },
-      ],
+      type: 'text',
+      admin: {
+        description: 'Budget range or monthly budget',
+      },
     },
     {
-      name: 'message',
+      name: 'details',
       type: 'textarea',
       required: true,
+      admin: {
+        description: 'Project details, campaign overview, or partnership vision',
+      },
     },
     {
-      name: 'specialRequests',
-      type: 'textarea',
+      name: 'formData',
+      type: 'json',
       admin: {
-        description: 'Any special requests or requirements',
+        description: 'Complete form submission data',
       },
     },
     {

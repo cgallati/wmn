@@ -30,8 +30,8 @@ export async function Footer() {
                   Shop Prints
                 </Link>
               )}
-              <Link href="/book" className="block text-gray-600 hover:text-black transition-colors text-sm">
-                Book Session
+              <Link href="/services" className="block text-gray-600 hover:text-black transition-colors text-sm">
+                Services
               </Link>
             </nav>
           </div>

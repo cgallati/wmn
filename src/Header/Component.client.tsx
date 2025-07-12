@@ -18,7 +18,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data: _data }) => {
   const navItems = [
     { label: 'Portfolio', href: '/' },
     ...(process.env.NEXT_PUBLIC_ENABLE_SHOP === 'true' ? [{ label: 'Shop', href: '/shop' }] : []),
-    { label: 'Book', href: '/book' },
+    { label: 'Services', href: '/services' },
   ]
 
   return (

@@ -354,29 +354,45 @@ export interface Booking {
   name: string;
   email: string;
   phone?: string | null;
-  eventType: 'wedding' | 'engagement' | 'portrait' | 'family' | 'corporate' | 'event' | 'other';
-  eventDate?: string | null;
+  serviceType: 'session' | 'brand-campaign' | 'creative-direction';
+  company?: string | null;
+  industry?: string | null;
   /**
-   * Preferred time for the event
+   * Preferred start date or event date
    */
-  eventTime?: string | null;
+  preferredDate?: string | null;
   /**
-   * Event location or preferred location
+   * Ideal start date for partnership
+   */
+  startDate?: string | null;
+  /**
+   * Venue, studio, or general area
    */
   location?: string | null;
   /**
-   * Approximate number of guests/participants
+   * Session duration, project timeline, or partnership type
    */
-  guestCount?: number | null;
-  duration?:
-    | ('1-hour' | '2-hours' | '3-hours' | '4-hours' | '6-hours' | '8-hours' | 'full-day' | 'multiple-days')
-    | null;
-  budget?: ('under-500' | '500-1000' | '1000-2500' | '2500-5000' | '5000-10000' | 'over-10000') | null;
-  message: string;
+  duration?: string | null;
   /**
-   * Any special requests or requirements
+   * Budget range or monthly budget
    */
-  specialRequests?: string | null;
+  budget?: string | null;
+  /**
+   * Project details, campaign overview, or partnership vision
+   */
+  details: string;
+  /**
+   * Complete form submission data
+   */
+  formData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   status: 'new' | 'contacted' | 'quoted' | 'booked' | 'completed' | 'cancelled';
   /**
    * Quoted price for the booking
@@ -1265,15 +1281,16 @@ export interface BookingsSelect<T extends boolean = true> {
   name?: T;
   email?: T;
   phone?: T;
-  eventType?: T;
-  eventDate?: T;
-  eventTime?: T;
+  serviceType?: T;
+  company?: T;
+  industry?: T;
+  preferredDate?: T;
+  startDate?: T;
   location?: T;
-  guestCount?: T;
   duration?: T;
   budget?: T;
-  message?: T;
-  specialRequests?: T;
+  details?: T;
+  formData?: T;
   status?: T;
   quote?: T;
   notes?: T;
