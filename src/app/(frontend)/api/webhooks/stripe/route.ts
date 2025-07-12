@@ -3,8 +3,13 @@ import { stripe } from '@/utilities/stripe'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import Stripe from 'stripe'
+import { isShopEnabled } from '@/utilities/featureFlags'
 
 export async function POST(request: NextRequest) {
+  if (!isShopEnabled()) {
+    return NextResponse.json({ error: 'Shop functionality is disabled' }, { status: 404 })
+  }
+
   const body = await request.text()
   const sig = request.headers.get('stripe-signature')
 

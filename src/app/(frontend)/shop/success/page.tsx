@@ -2,6 +2,8 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { CheckCircle } from 'lucide-react'
+import { isShopEnabled } from '@/utilities/featureFlags'
+import { notFound } from 'next/navigation'
 
 export const metadata: Metadata = {
   title: 'Order Confirmed | WMN Photo',
@@ -15,6 +17,10 @@ export const metadata: Metadata = {
 }
 
 export default function SuccessPage() {
+  if (!isShopEnabled()) {
+    notFound()
+  }
+
   return (
     <div className="min-h-screen bg-white flex items-center justify-center">
       <div className="text-center max-w-md mx-auto px-4">
@@ -33,11 +39,13 @@ export default function SuccessPage() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/shop">
-              <Button className="bg-black text-white hover:bg-gray-800 rounded-none px-8 py-3">
-                Continue Shopping
-              </Button>
-            </Link>
+            {isShopEnabled() && (
+              <Link href="/shop">
+                <Button className="bg-black text-white hover:bg-gray-800 rounded-none px-8 py-3">
+                  Continue Shopping
+                </Button>
+              </Link>
+            )}
             <Link href="/">
               <Button variant="outline" className="border-black text-black hover:bg-gray-50 rounded-none px-8 py-3">
                 Back to Portfolio

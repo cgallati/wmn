@@ -25,9 +25,11 @@ export async function Footer() {
               <Link href="/" className="block text-gray-600 hover:text-black transition-colors text-sm">
                 Portfolio
               </Link>
-              <Link href="/shop" className="block text-gray-600 hover:text-black transition-colors text-sm">
-                Shop Prints
-              </Link>
+              {process.env.NEXT_PUBLIC_ENABLE_SHOP === 'true' && (
+                <Link href="/shop" className="block text-gray-600 hover:text-black transition-colors text-sm">
+                  Shop Prints
+                </Link>
+              )}
               <Link href="/book" className="block text-gray-600 hover:text-black transition-colors text-sm">
                 Book Session
               </Link>

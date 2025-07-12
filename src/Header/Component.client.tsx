@@ -17,7 +17,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data: _data }) => {
 
   const navItems = [
     { label: 'Portfolio', href: '/' },
-    { label: 'Shop', href: '/shop' },
+    ...(process.env.NEXT_PUBLIC_ENABLE_SHOP === 'true' ? [{ label: 'Shop', href: '/shop' }] : []),
     { label: 'Book', href: '/book' },
   ]
 
@@ -43,32 +43,36 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data: _data }) => {
                 {item.label}
               </Link>
             ))}
-            <Link
-              href="/shop/cart"
-              className="flex items-center gap-2 text-gray-600 hover:text-black transition-colors"
-            >
-              <ShoppingCart className="w-5 h-5" />
-              {totalItems > 0 && (
-                <span className="bg-black text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {totalItems}
-                </span>
-              )}
-            </Link>
+            {process.env.NEXT_PUBLIC_ENABLE_SHOP === 'true' && (
+              <Link
+                href="/shop/cart"
+                className="flex items-center gap-2 text-gray-600 hover:text-black transition-colors"
+              >
+                <ShoppingCart className="w-5 h-5" />
+                {totalItems > 0 && (
+                  <span className="bg-black text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {totalItems}
+                  </span>
+                )}
+              </Link>
+            )}
           </nav>
           
           {/* Mobile menu button */}
           <div className="md:hidden">
-            <Link
-              href="/shop/cart"
-              className="flex items-center gap-2 text-gray-600 hover:text-black transition-colors"
-            >
-              <ShoppingCart className="w-5 h-5" />
-              {totalItems > 0 && (
-                <span className="bg-black text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {totalItems}
-                </span>
-              )}
-            </Link>
+            {process.env.NEXT_PUBLIC_ENABLE_SHOP === 'true' && (
+              <Link
+                href="/shop/cart"
+                className="flex items-center gap-2 text-gray-600 hover:text-black transition-colors"
+              >
+                <ShoppingCart className="w-5 h-5" />
+                {totalItems > 0 && (
+                  <span className="bg-black text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {totalItems}
+                  </span>
+                )}
+              </Link>
+            )}
           </div>
         </div>
         

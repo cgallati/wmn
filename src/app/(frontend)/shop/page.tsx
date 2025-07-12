@@ -2,6 +2,8 @@ import { Metadata } from 'next'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { Shop } from '@/components/Shop'
+import { isShopEnabled } from '@/utilities/featureFlags'
+import { notFound } from 'next/navigation'
 
 export const metadata: Metadata = {
   title: 'Shop | WMN Photo',
@@ -15,6 +17,10 @@ export const metadata: Metadata = {
 }
 
 export default async function ShopPage() {
+  if (!isShopEnabled()) {
+    notFound()
+  }
+
   const payload = await getPayload({ config })
 
   const products = await payload.find({

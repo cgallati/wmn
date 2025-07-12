@@ -1,5 +1,7 @@
 import { Metadata } from 'next'
 import { Cart } from '@/components/Cart'
+import { isShopEnabled } from '@/utilities/featureFlags'
+import { notFound } from 'next/navigation'
 
 export const metadata: Metadata = {
   title: 'Cart | WMN Photo',
@@ -13,5 +15,9 @@ export const metadata: Metadata = {
 }
 
 export default function CartPage() {
+  if (!isShopEnabled()) {
+    notFound()
+  }
+
   return <Cart />
 }
