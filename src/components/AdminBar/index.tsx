@@ -99,7 +99,6 @@ export const AdminBar: React.FC<{
           }}
           logo={<Title />}
           onAuthChange={onAuthChange}
-          onError={handleError}
           onPreviewExit={() => {
             try {
               fetch('/next/exit-preview').then(() => {
