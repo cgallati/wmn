@@ -23,9 +23,21 @@ const collectionLabels = {
     plural: 'Posts',
     singular: 'Post',
   },
-  projects: {
-    plural: 'Projects',
-    singular: 'Project',
+  artwork: {
+    plural: 'Artwork',
+    singular: 'Artwork',
+  },
+  products: {
+    plural: 'Products',
+    singular: 'Product',
+  },
+  orders: {
+    plural: 'Orders',
+    singular: 'Order',
+  },
+  bookings: {
+    plural: 'Bookings',
+    singular: 'Booking',
   },
 }
 
@@ -37,14 +49,31 @@ export const AdminBar: React.FC<{
   const { adminBarProps } = props || {}
   const segments = useSelectedLayoutSegments()
   const [show, setShow] = useState(false)
-  const collection = (
-    collectionLabels[segments?.[1] as keyof typeof collectionLabels] ? segments[1] : 'pages'
-  ) as keyof typeof collectionLabels
+  const [hasError, setHasError] = useState(false)
+  const collection = React.useMemo(() => {
+    const segmentKey = segments?.[1] as keyof typeof collectionLabels
+    return collectionLabels[segmentKey] ? segmentKey : 'pages'
+  }, [segments]) as keyof typeof collectionLabels
   const router = useRouter()
 
   const onAuthChange = React.useCallback((user: PayloadMeUser) => {
-    setShow(Boolean(user?.id))
+    try {
+      setShow(Boolean(user?.id))
+      setHasError(false)
+    } catch (error) {
+      console.warn('AdminBar auth change error:', error)
+      setHasError(true)
+    }
   }, [])
+
+  const handleError = React.useCallback((error: any) => {
+    console.warn('AdminBar load error:', error)
+    setHasError(true)
+  }, [])
+
+  if (hasError) {
+    return null // Hide admin bar if there's an error
+  }
 
   return (
     <div
@@ -70,11 +99,16 @@ export const AdminBar: React.FC<{
           }}
           logo={<Title />}
           onAuthChange={onAuthChange}
+          onError={handleError}
           onPreviewExit={() => {
-            fetch('/next/exit-preview').then(() => {
-              router.push('/')
-              router.refresh()
-            })
+            try {
+              fetch('/next/exit-preview').then(() => {
+                router.push('/')
+                router.refresh()
+              }).catch(handleError)
+            } catch (error) {
+              handleError(error)
+            }
           }}
           style={{
             backgroundColor: 'transparent',

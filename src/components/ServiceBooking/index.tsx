@@ -26,7 +26,7 @@ interface FormField {
 const serviceConfigs: Record<string, ServiceConfig> = {
   session: {
     title: 'Book Photography Session',
-    description: 'Let&apos;s discuss your photography session needs',
+    description: "Let's discuss your photography session needs",
     fields: [
       { name: 'name', label: 'Full Name', type: 'text', required: true },
       { name: 'email', label: 'Email', type: 'email', required: true },
@@ -57,7 +57,7 @@ const serviceConfigs: Record<string, ServiceConfig> = {
   },
   'brand-campaign': {
     title: 'Brand Campaign Inquiry',
-    description: 'Let&apos;s create something impactful for your brand',
+    description: "Let's create something impactful for your brand",
     fields: [
       { name: 'name', label: 'Contact Name', type: 'text', required: true },
       { name: 'email', label: 'Email', type: 'email', required: true },
@@ -90,7 +90,7 @@ const serviceConfigs: Record<string, ServiceConfig> = {
   },
   'creative-direction': {
     title: 'Creative Direction Partnership',
-    description: 'Let&apos;s discuss a long-term creative partnership',
+    description: "Let's discuss a long-term creative partnership",
     fields: [
       { name: 'name', label: 'Contact Name', type: 'text', required: true },
       { name: 'email', label: 'Email', type: 'email', required: true },
@@ -175,7 +175,7 @@ export const ServiceBooking: React.FC<ServiceBookingProps> = ({ serviceType }) =
         <div className="text-center max-w-md mx-auto px-4">
           <h1 className="text-3xl font-light text-black mb-6">Thank You!</h1>
           <p className="text-gray-600 text-lg mb-8">
-            Your inquiry has been received. We&apos;ll get back to you within 24 hours to discuss your project.
+            Your inquiry has been received. We'll get back to you within 24 hours to discuss your project.
           </p>
           <Link
             href="/services"

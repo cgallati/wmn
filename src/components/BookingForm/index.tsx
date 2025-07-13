@@ -78,7 +78,7 @@ export const BookingForm: React.FC = () => {
         <div className="bg-green-50 border border-green-200 rounded-lg p-8 max-w-md mx-auto">
           <h2 className="text-2xl font-light text-green-800 mb-4">Thank You!</h2>
           <p className="text-green-700 mb-6">
-            Your booking inquiry has been submitted successfully. I&apos;ll get back to you within 24 hours.
+            Your booking inquiry has been submitted successfully. I'll get back to you within 24 hours.
           </p>
           <Button
             onClick={() => setIsSubmitted(false)}
