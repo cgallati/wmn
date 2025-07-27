@@ -67,6 +67,7 @@ export interface Config {
   };
   blocks: {};
   collections: {
+    about: About;
     artwork: Artwork;
     products: Product;
     orders: Order;
@@ -87,6 +88,7 @@ export interface Config {
   };
   collectionsJoins: {};
   collectionsSelect: {
+    about: AboutSelect<false> | AboutSelect<true>;
     artwork: ArtworkSelect<false> | ArtworkSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
@@ -151,29 +153,45 @@ export interface UserAuthOperations {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "artwork".
+ * via the `definition` "about".
  */
-export interface Artwork {
+export interface About {
   id: number;
+  /**
+   * Internal title for this about page content (not displayed on the page)
+   */
   title: string;
-  image: number | Media;
-  series?: string | null;
-  year?: number | null;
-  description?: string | null;
-  medium?: string | null;
-  dimensions?: string | null;
-  location?: string | null;
-  camera?: string | null;
-  lens?: string | null;
-  settings?: {
-    aperture?: string | null;
-    shutter?: string | null;
-    iso?: number | null;
-  };
-  featured?: boolean | null;
+  /**
+   * Professional profile photograph
+   */
+  profilePhoto?: (number | null) | Media;
+  /**
+   * Short biographical information (plain text)
+   */
+  bio?: string | null;
+  /**
+   * Artist statement describing your work and approach (plain text)
+   */
+  artistStatement?: string | null;
+  /**
+   * Curriculum Vitae with rich text formatting
+   */
+  cv?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   publishedAt?: string | null;
-  slug?: string | null;
-  slugLock?: boolean | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -269,6 +287,35 @@ export interface Media {
       filename?: string | null;
     };
   };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "artwork".
+ */
+export interface Artwork {
+  id: number;
+  title: string;
+  image: number | Media;
+  series?: string | null;
+  year?: number | null;
+  description?: string | null;
+  medium?: string | null;
+  dimensions?: string | null;
+  location?: string | null;
+  camera?: string | null;
+  lens?: string | null;
+  settings?: {
+    aperture?: string | null;
+    shutter?: string | null;
+    iso?: number | null;
+  };
+  featured?: boolean | null;
+  publishedAt?: string | null;
+  slug?: string | null;
+  slugLock?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1080,6 +1127,10 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
+        relationTo: 'about';
+        value: number | About;
+      } | null)
+    | ({
         relationTo: 'artwork';
         value: number | Artwork;
       } | null)
@@ -1176,6 +1227,21 @@ export interface PayloadMigration {
   batch?: number | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "about_select".
+ */
+export interface AboutSelect<T extends boolean = true> {
+  title?: T;
+  profilePhoto?: T;
+  bio?: T;
+  artistStatement?: T;
+  cv?: T;
+  publishedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

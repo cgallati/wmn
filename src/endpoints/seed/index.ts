@@ -1,5 +1,6 @@
 import type { CollectionSlug, GlobalSlug, Payload, PayloadRequest, File } from 'payload'
 
+import { seedAbout } from './about-seed'
 import { contactForm as contactFormData } from './contact-form'
 import { contact as contactPageData } from './contact-page'
 import { home } from './home'
@@ -11,6 +12,7 @@ import { post2 } from './post-2'
 import { post3 } from './post-3'
 
 const collections: CollectionSlug[] = [
+  'about',
   'categories',
   'media',
   'pages',
@@ -338,6 +340,9 @@ export const seed = async ({
       },
     }),
   ])
+
+  payload.logger.info(`— Seeding about page...`)
+  await seedAbout(payload)
 
   payload.logger.info('Seeded database successfully!')
 }

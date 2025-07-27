@@ -7,6 +7,7 @@ import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
 import { fileURLToPath } from 'url'
 
+import { About } from './collections/About'
 import { Artwork } from './collections/Artwork'
 import { Bookings } from './collections/Bookings'
 import { Categories } from './collections/Categories'
@@ -78,7 +79,7 @@ export default buildConfig({
           },
         }
   ),
-  collections: [Artwork, Products, Orders, Bookings, Pages, Posts, Media, Categories, Users],
+  collections: [About, Artwork, Products, Orders, Bookings, Pages, Posts, Media, Categories, Users],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
   plugins: [
