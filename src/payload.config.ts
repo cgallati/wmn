@@ -78,7 +78,7 @@ export default buildConfig({
             url: process.env.DATABASE_URI || '',
             authToken: process.env.DATABASE_AUTH_TOKEN || '',
           },
-          prodMigrations: migrations,
+          // Using build-time migrations instead of prodMigrations
         }
   ),
   collections: [About, Artwork, Products, Orders, Bookings, Pages, Posts, Media, Categories, Users],
