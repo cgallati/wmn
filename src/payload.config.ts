@@ -9,7 +9,7 @@ import { fileURLToPath } from 'url'
 
 import { About } from './collections/About'
 import { Artwork } from './collections/Artwork'
-import { Bookings } from './collections/Bookings'
+// import { Bookings } from './collections/Bookings' // Temporarily disabled
 import { Categories } from './collections/Categories'
 import { Media } from './collections/Media'
 import { Orders } from './collections/Orders'
@@ -22,7 +22,7 @@ import { Header } from './Header/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
-import { migrations } from './migrations'
+// import { migrations } from './migrations' // Using build-time migrations
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -81,7 +81,7 @@ export default buildConfig({
           // Using build-time migrations instead of prodMigrations
         }
   ),
-  collections: [About, Artwork, Products, Orders, Bookings, Pages, Posts, Media, Categories, Users],
+  collections: [About, Artwork, Products, Orders, /* Bookings, */ Pages, Posts, Media, Categories, Users],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
   plugins: [

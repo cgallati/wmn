@@ -71,7 +71,6 @@ export interface Config {
     artwork: Artwork;
     products: Product;
     orders: Order;
-    bookings: Booking;
     pages: Page;
     posts: Post;
     media: Media;
@@ -92,7 +91,6 @@ export interface Config {
     artwork: ArtworkSelect<false> | ArtworkSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
-    bookings: BookingsSelect<false> | BookingsSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
@@ -388,66 +386,6 @@ export interface Order {
   total: number;
   status: 'pending' | 'paid' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   trackingNumber?: string | null;
-  notes?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "bookings".
- */
-export interface Booking {
-  id: number;
-  name: string;
-  email: string;
-  phone?: string | null;
-  serviceType: 'session' | 'brand-campaign' | 'creative-direction';
-  company?: string | null;
-  industry?: string | null;
-  /**
-   * Preferred start date or event date
-   */
-  preferredDate?: string | null;
-  /**
-   * Ideal start date for partnership
-   */
-  startDate?: string | null;
-  /**
-   * Venue, studio, or general area
-   */
-  location?: string | null;
-  /**
-   * Session duration, project timeline, or partnership type
-   */
-  duration?: string | null;
-  /**
-   * Budget range or monthly budget
-   */
-  budget?: string | null;
-  /**
-   * Project details, campaign overview, or partnership vision
-   */
-  details: string;
-  /**
-   * Complete form submission data
-   */
-  formData?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  status: 'new' | 'contacted' | 'quoted' | 'booked' | 'completed' | 'cancelled';
-  /**
-   * Quoted price for the booking
-   */
-  quote?: number | null;
-  /**
-   * Internal notes about the booking
-   */
   notes?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -1143,10 +1081,6 @@ export interface PayloadLockedDocument {
         value: number | Order;
       } | null)
     | ({
-        relationTo: 'bookings';
-        value: number | Booking;
-      } | null)
-    | ({
         relationTo: 'pages';
         value: number | Page;
       } | null)
@@ -1335,30 +1269,6 @@ export interface OrdersSelect<T extends boolean = true> {
   total?: T;
   status?: T;
   trackingNumber?: T;
-  notes?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "bookings_select".
- */
-export interface BookingsSelect<T extends boolean = true> {
-  name?: T;
-  email?: T;
-  phone?: T;
-  serviceType?: T;
-  company?: T;
-  industry?: T;
-  preferredDate?: T;
-  startDate?: T;
-  location?: T;
-  duration?: T;
-  budget?: T;
-  details?: T;
-  formData?: T;
-  status?: T;
-  quote?: T;
   notes?: T;
   updatedAt?: T;
   createdAt?: T;

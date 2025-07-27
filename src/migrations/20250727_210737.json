@@ -1294,167 +1294,6 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "bookings": {
-      "name": "bookings",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "email": {
-          "name": "email",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "phone": {
-          "name": "phone",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "service_type": {
-          "name": "service_type",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "company": {
-          "name": "company",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "industry": {
-          "name": "industry",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "preferred_date": {
-          "name": "preferred_date",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "start_date": {
-          "name": "start_date",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "location": {
-          "name": "location",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "duration": {
-          "name": "duration",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "budget": {
-          "name": "budget",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "details": {
-          "name": "details",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "form_data": {
-          "name": "form_data",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "status": {
-          "name": "status",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'new'"
-        },
-        "quote": {
-          "name": "quote",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "notes": {
-          "name": "notes",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))"
-        }
-      },
-      "indexes": {
-        "bookings_updated_at_idx": {
-          "name": "bookings_updated_at_idx",
-          "columns": [
-            "updated_at"
-          ],
-          "isUnique": false
-        },
-        "bookings_created_at_idx": {
-          "name": "bookings_created_at_idx",
-          "columns": [
-            "created_at"
-          ],
-          "isUnique": false
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
     "pages_hero_links": {
       "name": "pages_hero_links",
       "columns": {
@@ -7995,13 +7834,6 @@
           "notNull": false,
           "autoincrement": false
         },
-        "bookings_id": {
-          "name": "bookings_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
         "pages_id": {
           "name": "pages_id",
           "type": "integer",
@@ -8120,13 +7952,6 @@
           "name": "payload_locked_documents_rels_orders_id_idx",
           "columns": [
             "orders_id"
-          ],
-          "isUnique": false
-        },
-        "payload_locked_documents_rels_bookings_id_idx": {
-          "name": "payload_locked_documents_rels_bookings_id_idx",
-          "columns": [
-            "bookings_id"
           ],
           "isUnique": false
         },
@@ -8260,19 +8085,6 @@
           "tableTo": "orders",
           "columnsFrom": [
             "orders_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "payload_locked_documents_rels_bookings_fk": {
-          "name": "payload_locked_documents_rels_bookings_fk",
-          "tableFrom": "payload_locked_documents_rels",
-          "tableTo": "bookings",
-          "columnsFrom": [
-            "bookings_id"
           ],
           "columnsTo": [
             "id"
@@ -9153,6 +8965,6 @@
   "internal": {
     "indexes": {}
   },
-  "id": "a0c6f53c-c724-42cf-909a-e79adad25d65",
+  "id": "2482e064-2d53-4e33-8357-18ddb3a6ded8",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }
