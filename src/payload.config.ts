@@ -78,7 +78,7 @@ export default buildConfig({
             url: process.env.DATABASE_URI || '',
             authToken: process.env.DATABASE_AUTH_TOKEN || '',
           },
-          prodMigrations: migrations,
+          // Don't run prodMigrations on Vercel - use build-time migrations instead
         }
   ),
   collections: [About, Artwork, Products, Orders, Bookings, Pages, Posts, Media, Categories, Users],
