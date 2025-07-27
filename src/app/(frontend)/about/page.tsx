@@ -8,13 +8,20 @@ import { RichText } from '@payloadcms/richtext-lexical/react'
 export default async function AboutPage() {
   const payload = await getPayload({ config })
   
-  // Get the first about entry (there should only be one)
-  const aboutData = await payload.find({
-    collection: 'about',
-    limit: 1,
-  })
-
-  const about: About | null = aboutData.docs[0] || null
+  let about: About | null = null
+  
+  try {
+    // Get the first about entry (there should only be one)
+    const aboutData = await payload.find({
+      collection: 'about',
+      limit: 1,
+    })
+    about = aboutData.docs[0] || null
+  } catch (error) {
+    // Handle case where collection doesn't exist yet or other database errors
+    console.log('About collection not found or database error:', error)
+    about = null
+  }
 
   if (!about) {
     return (
