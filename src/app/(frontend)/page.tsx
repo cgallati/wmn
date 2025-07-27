@@ -3,6 +3,9 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 import { Portfolio } from '@/components/Portfolio'
 
+// Cache homepage for 30 minutes - artwork changes trigger revalidation
+export const revalidate = 1800
+
 export const metadata: Metadata = {
   title: 'Portfolio | WMN Photo',
   description: 'A curated collection of photographic work by WMN',

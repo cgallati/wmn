@@ -5,6 +5,9 @@ import type { About } from '@/payload-types'
 import { Media } from '@/components/Media'
 import { RichText } from '@payloadcms/richtext-lexical/react'
 
+// Cache about page for 1 hour - content changes trigger revalidation
+export const revalidate = 3600
+
 export default async function AboutPage() {
   const payload = await getPayload({ config })
   

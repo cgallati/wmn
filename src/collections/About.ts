@@ -10,6 +10,8 @@ import {
 
 import { authenticated } from '../access/authenticated'
 import { authenticatedOrPublished } from '../access/authenticatedOrPublished'
+import { populatePublishedAt } from '../hooks/populatePublishedAt'
+import { revalidateAbout, revalidateAboutDelete } from '../hooks/revalidateAbout'
 
 export const About: CollectionConfig<'about'> = {
   slug: 'about',
@@ -89,6 +91,11 @@ export const About: CollectionConfig<'about'> = {
       },
     },
   ],
+  hooks: {
+    beforeChange: [populatePublishedAt],
+    afterChange: [revalidateAbout],
+    afterDelete: [revalidateAboutDelete],
+  },
   versions: {
     drafts: {
       autosave: {

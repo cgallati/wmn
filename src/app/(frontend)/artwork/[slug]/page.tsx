@@ -4,6 +4,9 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 import { ArtworkDetail } from '@/components/ArtworkDetail'
 
+// Cache individual artwork pages for 2 hours - artwork changes trigger revalidation
+export const revalidate = 7200
+
 interface ArtworkPageProps {
   params: Promise<{
     slug: string
