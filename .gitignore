@@ -6,6 +6,9 @@ node_modules
 .next
 .vercel
 
+# IDE files
+.idea/
+
 # Local SQLite database files
 dev.db
 dev.db-wal
