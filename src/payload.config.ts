@@ -1,5 +1,5 @@
 // storage-adapter-import-placeholder
-import { sqliteAdapter } from '@payloadcms/db-sqlite'
+import { mongooseAdapter } from '@payloadcms/db-mongodb'
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 
 import sharp from 'sharp' // sharp-import
@@ -22,7 +22,6 @@ import { Header } from './Header/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
-// import { migrations } from './migrations' // Using build-time migrations
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -66,21 +65,9 @@ export default buildConfig({
   },
   // This config helps us configure global or default features that the other editors can inherit
   editor: defaultLexical,
-  db: sqliteAdapter(
-    process.env.USE_LOCAL_DB === 'true'
-      ? {
-          client: {
-            url: 'file:./dev.db',
-          },
-        }
-      : {
-          client: {
-            url: process.env.DATABASE_URI || '',
-            authToken: process.env.DATABASE_AUTH_TOKEN || '',
-          },
-          // Using build-time migrations instead of prodMigrations
-        }
-  ),
+  db: mongooseAdapter({
+    url: process.env.MONGODB_URI || process.env.DATABASE_URI || '',
+  }),
   collections: [About, Artwork, Products, Orders, /* Bookings, */ Pages, Posts, Media, Categories, Users],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
