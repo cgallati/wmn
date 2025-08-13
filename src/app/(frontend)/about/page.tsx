@@ -53,35 +53,34 @@ export default async function AboutPage() {
           </div>
         )}
         
-        {/* Content */}
+        {/* Content Sections */}
         <div className={`${about.profilePhoto ? 'lg:col-span-2' : 'lg:col-span-3'} space-y-8`}>
-          {/* Bio */}
-          {about.bio && (
-            <div>
-              <h2 className="text-2xl font-light mb-4">Biography</h2>
-              <div className="text-gray-700 leading-relaxed whitespace-pre-line">
-                {about.bio}
-              </div>
-            </div>
-          )}
-          
-          {/* Artist Statement */}
-          {about.artistStatement && (
-            <div>
-              <h2 className="text-2xl font-light mb-4">Artist Statement</h2>
-              <div className="text-gray-700 leading-relaxed whitespace-pre-line">
-                {about.artistStatement}
-              </div>
-            </div>
-          )}
-          
-          {/* CV */}
-          {about.cv && (
-            <div>
-              <h2 className="text-2xl font-light mb-4">Curriculum Vitae</h2>
-              <div className="prose prose-lg max-w-none">
-                <RichText data={about.cv} />
-              </div>
+          {about.sections && about.sections.length > 0 ? (
+            about.sections
+              .filter(section => section.isVisible)
+              .sort((a, b) => (a.order || 0) - (b.order || 0))
+              .map((section, index) => {
+                const sectionTitles = {
+                  bio: 'Biography',
+                  artistStatement: 'Artist Statement',
+                  cv: 'Curriculum Vitae',
+                  custom: section.title || 'About'
+                }
+                
+                const sectionTitle = sectionTitles[section.sectionType as keyof typeof sectionTitles] || 'About'
+                
+                return (
+                  <div key={`${section.sectionType}-${index}`}>
+                    <h2 className="text-2xl font-light mb-4">{sectionTitle}</h2>
+                    <div className="prose prose-lg max-w-none text-gray-700">
+                      <RichText data={section.content} />
+                    </div>
+                  </div>
+                )
+              })
+          ) : (
+            <div className="text-gray-500">
+              <p>About content is being updated. Please check back soon.</p>
             </div>
           )}
         </div>

@@ -49,38 +49,84 @@ export const About: CollectionConfig<'about'> = {
       },
     },
     {
-      name: 'bio',
-      type: 'textarea',
+      name: 'sections',
+      type: 'array',
       required: false,
+      minRows: 1,
+      maxRows: 10,
+      fields: [
+        {
+          name: 'sectionType',
+          type: 'select',
+          required: true,
+          options: [
+            { label: 'Biography', value: 'bio' },
+            { label: 'Artist Statement', value: 'artistStatement' },
+            { label: 'Curriculum Vitae', value: 'cv' },
+            { label: 'Custom Section', value: 'custom' },
+          ],
+          admin: {
+            description: 'Type of content section',
+          },
+        },
+        {
+          name: 'title',
+          type: 'text',
+          required: false,
+          admin: {
+            description: 'Section title (optional - leave blank to use default titles)',
+            condition: (data, siblingData) => siblingData.sectionType === 'custom',
+          },
+        },
+        {
+          name: 'content',
+          type: 'richText',
+          required: true,
+          editor: lexicalEditor({
+            features: [
+              ParagraphFeature(),
+              HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] }),
+              BoldFeature(),
+              ItalicFeature(),
+              UnderlineFeature(),
+            ],
+          }),
+          admin: {
+            description: 'Rich text content for this section',
+          },
+        },
+        {
+          name: 'order',
+          type: 'number',
+          required: true,
+          defaultValue: 1,
+          admin: {
+            description: 'Display order (1 = first, 2 = second, etc.)',
+          },
+        },
+        {
+          name: 'isVisible',
+          type: 'checkbox',
+          defaultValue: true,
+          admin: {
+            description: 'Show/hide this section on the website',
+          },
+        },
+      ],
       admin: {
-        description: 'Short biographical information (plain text)',
-        rows: 4,
-      },
-    },
-    {
-      name: 'artistStatement',
-      type: 'textarea',
-      required: false,
-      admin: {
-        description: 'Artist statement describing your work and approach (plain text)',
-        rows: 6,
-      },
-    },
-    {
-      name: 'cv',
-      type: 'richText',
-      required: false,
-      editor: lexicalEditor({
-        features: [
-          ParagraphFeature(),
-          HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] }),
-          BoldFeature(),
-          ItalicFeature(),
-          UnderlineFeature(),
-        ],
-      }),
-      admin: {
-        description: 'Curriculum Vitae with rich text formatting',
+        description: 'Content sections that will appear on the About page',
+        initCollapsed: true,
+        components: {
+          RowLabel: ({ data, index }) => {
+            const sectionTypeLabels = {
+              bio: 'Biography',
+              artistStatement: 'Artist Statement', 
+              cv: 'Curriculum Vitae',
+              custom: data?.title || 'Custom Section'
+            }
+            return sectionTypeLabels[data?.sectionType] || `Section ${index + 1}`
+          }
+        }
       },
     },
     {

@@ -16,6 +16,8 @@ import { Orders } from './collections/Orders'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
 import { Products } from './collections/Products'
+import { Services } from './collections/Services'
+import { ServicesPage } from './collections/ServicesPage'
 import { Users } from './collections/Users'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
@@ -68,7 +70,7 @@ export default buildConfig({
   db: mongooseAdapter({
     url: process.env.MONGODB_URI || process.env.DATABASE_URI || '',
   }),
-  collections: [About, Artwork, Products, Orders, /* Bookings, */ Pages, Posts, Media, Categories, Users],
+  collections: [About, Artwork, Products, Orders, Services, ServicesPage, /* Bookings, */ Pages, Posts, Media, Categories, Users],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
   plugins: [

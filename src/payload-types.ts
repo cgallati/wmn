@@ -71,6 +71,8 @@ export interface Config {
     artwork: Artwork;
     products: Product;
     orders: Order;
+    services: Service;
+    'services-page': ServicesPage;
     pages: Page;
     posts: Post;
     media: Media;
@@ -91,6 +93,8 @@ export interface Config {
     artwork: ArtworkSelect<false> | ArtworkSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
+    services: ServicesSelect<false> | ServicesSelect<true>;
+    'services-page': ServicesPageSelect<false> | ServicesPageSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
@@ -164,31 +168,47 @@ export interface About {
    */
   profilePhoto?: (string | null) | Media;
   /**
-   * Short biographical information (plain text)
+   * Content sections that will appear on the About page
    */
-  bio?: string | null;
-  /**
-   * Artist statement describing your work and approach (plain text)
-   */
-  artistStatement?: string | null;
-  /**
-   * Curriculum Vitae with rich text formatting
-   */
-  cv?: {
-    root: {
-      type: string;
-      children: {
-        type: string;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
+  sections?:
+    | {
+        /**
+         * Type of content section
+         */
+        sectionType: 'bio' | 'artistStatement' | 'cv' | 'custom';
+        /**
+         * Section title (optional - leave blank to use default titles)
+         */
+        title?: string | null;
+        /**
+         * Rich text content for this section
+         */
+        content: {
+          root: {
+            type: string;
+            children: {
+              type: string;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        /**
+         * Display order (1 = first, 2 = second, etc.)
+         */
+        order: number;
+        /**
+         * Show/hide this section on the website
+         */
+        isVisible?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
   publishedAt?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -389,6 +409,99 @@ export interface Order {
   notes?: string | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services".
+ */
+export interface Service {
+  id: string;
+  /**
+   * Name of the service (e.g., "Photography Sessions")
+   */
+  title: string;
+  /**
+   * Brief description of the service
+   */
+  description: string;
+  /**
+   * Key features or benefits of this service
+   */
+  features: {
+    feature: string;
+    id?: string | null;
+  }[];
+  /**
+   * Icon to display for this service
+   */
+  icon: 'clock' | 'briefcase' | 'zap' | 'camera' | 'users' | 'star';
+  /**
+   * Text for the call-to-action button
+   */
+  ctaText: string;
+  /**
+   * URL or path for the CTA button (e.g., "/services/book?type=session")
+   */
+  ctaLink: string;
+  /**
+   * Display order (1 = first, 2 = second, etc.)
+   */
+  order: number;
+  /**
+   * Show/hide this service on the website
+   */
+  isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services-page".
+ */
+export interface ServicesPage {
+  id: string;
+  /**
+   * Internal title for this services page content (not displayed on the page)
+   */
+  title: string;
+  /**
+   * Main heading displayed on the services page
+   */
+  pageTitle: string;
+  /**
+   * Description text that appears below the main heading
+   */
+  pageDescription: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Text that appears above the consultation link
+   */
+  consultationText: string;
+  /**
+   * Text for the consultation link
+   */
+  consultationLinkText: string;
+  /**
+   * Email address for the consultation link
+   */
+  consultationEmail: string;
+  publishedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1081,6 +1194,14 @@ export interface PayloadLockedDocument {
         value: string | Order;
       } | null)
     | ({
+        relationTo: 'services';
+        value: string | Service;
+      } | null)
+    | ({
+        relationTo: 'services-page';
+        value: string | ServicesPage;
+      } | null)
+    | ({
         relationTo: 'pages';
         value: string | Page;
       } | null)
@@ -1169,9 +1290,16 @@ export interface PayloadMigration {
 export interface AboutSelect<T extends boolean = true> {
   title?: T;
   profilePhoto?: T;
-  bio?: T;
-  artistStatement?: T;
-  cv?: T;
+  sections?:
+    | T
+    | {
+        sectionType?: T;
+        title?: T;
+        content?: T;
+        order?: T;
+        isVisible?: T;
+        id?: T;
+      };
   publishedAt?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1272,6 +1400,43 @@ export interface OrdersSelect<T extends boolean = true> {
   notes?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services_select".
+ */
+export interface ServicesSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  features?:
+    | T
+    | {
+        feature?: T;
+        id?: T;
+      };
+  icon?: T;
+  ctaText?: T;
+  ctaLink?: T;
+  order?: T;
+  isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services-page_select".
+ */
+export interface ServicesPageSelect<T extends boolean = true> {
+  title?: T;
+  pageTitle?: T;
+  pageDescription?: T;
+  consultationText?: T;
+  consultationLinkText?: T;
+  consultationEmail?: T;
+  publishedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1836,6 +2001,10 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  */
 export interface Header {
   id: string;
+  /**
+   * Upload your logo image. If not provided, "WMN" text will be shown as fallback.
+   */
+  logo?: (string | null) | Media;
   navItems?:
     | {
         link: {
@@ -1865,6 +2034,34 @@ export interface Header {
  */
 export interface Footer {
   id: string;
+  /**
+   * Contact information displayed in footer
+   */
+  contactInfo?: {
+    /**
+     * Contact email address
+     */
+    email?: string | null;
+    /**
+     * Phone number for display
+     */
+    phone?: string | null;
+    /**
+     * Phone number for tel: link (no spaces/formatting)
+     */
+    phoneHref?: string | null;
+    /**
+     * Instagram handle for display
+     */
+    instagram?: string | null;
+    /**
+     * Full Instagram URL
+     */
+    instagramUrl?: string | null;
+  };
+  /**
+   * Navigation links in footer (leave empty to use default links)
+   */
   navItems?:
     | {
         link: {
@@ -1885,6 +2082,20 @@ export interface Footer {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Copyright text (year will be added automatically)
+   */
+  copyrightText?: string | null;
+  /**
+   * Legal/policy links in footer
+   */
+  legalLinks?:
+    | {
+        text: string;
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1893,6 +2104,7 @@ export interface Footer {
  * via the `definition` "header_select".
  */
 export interface HeaderSelect<T extends boolean = true> {
+  logo?: T;
   navItems?:
     | T
     | {
@@ -1916,6 +2128,15 @@ export interface HeaderSelect<T extends boolean = true> {
  * via the `definition` "footer_select".
  */
 export interface FooterSelect<T extends boolean = true> {
+  contactInfo?:
+    | T
+    | {
+        email?: T;
+        phone?: T;
+        phoneHref?: T;
+        instagram?: T;
+        instagramUrl?: T;
+      };
   navItems?:
     | T
     | {
@@ -1928,6 +2149,14 @@ export interface FooterSelect<T extends boolean = true> {
               url?: T;
               label?: T;
             };
+        id?: T;
+      };
+  copyrightText?: T;
+  legalLinks?:
+    | T
+    | {
+        text?: T;
+        url?: T;
         id?: T;
       };
   updatedAt?: T;

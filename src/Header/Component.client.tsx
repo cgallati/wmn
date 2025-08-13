@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation'
 import React from 'react'
 import { useCart } from '@/providers/Cart'
 import { ShoppingCart } from 'lucide-react'
+import { Media } from '@/components/Media'
 
 import type { Header } from '@/payload-types'
 
@@ -11,7 +12,7 @@ interface HeaderClientProps {
   data: Header
 }
 
-export const HeaderClient: React.FC<HeaderClientProps> = ({ data: _data }) => {
+export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
   const pathname = usePathname()
   const { totalItems } = useCart()
 
@@ -23,13 +24,22 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data: _data }) => {
   ]
 
   return (
-    <header className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 z-50">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-center justify-between h-20">
-          <Link href="/" className="text-4xl font-light text-black">
-            WMN
+    <header className="bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          <Link href="/" className="flex items-center">
+            {data?.logo && typeof data.logo === 'object' ? (
+              <Media 
+                resource={data.logo} 
+                imgClassName="h-8 w-auto max-w-[150px] object-contain"
+                size="150px"
+                priority={true} 
+              />
+            ) : (
+              <span className="text-4xl font-light text-black">WMN</span>
+            )}
           </Link>
-          
+
           <nav className="hidden md:flex items-center space-x-8">
             {navItems.map((item) => (
               <Link
@@ -58,7 +68,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data: _data }) => {
               </Link>
             )}
           </nav>
-          
+
           {/* Mobile menu button */}
           <div className="md:hidden">
             {process.env.NEXT_PUBLIC_ENABLE_SHOP === 'true' && (
@@ -76,18 +86,16 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data: _data }) => {
             )}
           </div>
         </div>
-        
+
         {/* Mobile navigation */}
-        <div className="md:hidden border-t border-gray-200 py-4">
+        <div className="md:hidden py-4">
           <nav className="flex justify-center space-x-6">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 className={`text-base font-medium transition-colors ${
-                  pathname === item.href
-                    ? 'text-black'
-                    : 'text-gray-600 hover:text-black'
+                  pathname === item.href ? 'text-black' : 'text-gray-600 hover:text-black'
                 }`}
               >
                 {item.label}

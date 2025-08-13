@@ -10,6 +10,15 @@ export const Header: GlobalConfig = {
   },
   fields: [
     {
+      name: 'logo',
+      type: 'upload',
+      relationTo: 'media',
+      required: false,
+      admin: {
+        description: 'Upload your logo image. If not provided, "WMN" text will be shown as fallback.',
+      },
+    },
+    {
       name: 'navItems',
       type: 'array',
       fields: [
