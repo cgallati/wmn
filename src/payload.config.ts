@@ -1,29 +1,29 @@
 // storage-adapter-import-placeholder
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
-import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 
-import sharp from 'sharp' // sharp-import
+import {
+  BoldFeature,
+  EXPERIMENTAL_TableFeature,
+  IndentFeature,
+  ItalicFeature,
+  LinkFeature,
+  OrderedListFeature,
+  UnderlineFeature,
+  UnorderedListFeature,
+  lexicalEditor,
+} from '@payloadcms/richtext-lexical'
 import path from 'path'
-import { buildConfig, PayloadRequest } from 'payload'
+import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 
-import { About } from './collections/About'
-import { Artwork } from './collections/Artwork'
-// import { Bookings } from './collections/Bookings' // Temporarily disabled
-import { Categories } from './collections/Categories'
-import { Media } from './collections/Media'
-import { Orders } from './collections/Orders'
-import { Pages } from './collections/Pages'
-import { Posts } from './collections/Posts'
-import { Products } from './collections/Products'
-import { Services } from './collections/Services'
-import { ServicesPage } from './collections/ServicesPage'
-import { Users } from './collections/Users'
-import { Footer } from './Footer/config'
-import { Header } from './Header/config'
+import { Artwork } from '@/collections/Artwork'
+import { Categories } from '@/collections/Categories'
+import { Media } from '@/collections/Media'
+import { Pages } from '@/collections/Pages'
+import { Users } from '@/collections/Users'
+import { Footer } from '@/globals/Footer'
+import { Header } from '@/globals/Header'
 import { plugins } from './plugins'
-import { defaultLexical } from '@/fields/defaultLexical'
-import { getServerSideURL } from './utilities/getURL'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -32,80 +32,66 @@ export default buildConfig({
   admin: {
     components: {
       // The `BeforeLogin` component renders a message that you see while logging into your admin panel.
-      // Feel free to delete this at any time. Simply remove the line below.
-      beforeLogin: ['@/components/BeforeLogin'],
+      // Feel free to delete this at any time. Simply remove the line below and the import `BeforeLogin` statement on line 15.
+      beforeLogin: ['@/components/BeforeLogin#BeforeLogin'],
       // The `BeforeDashboard` component renders the 'welcome' block that you see after logging into your admin panel.
-      // Feel free to delete this at any time. Simply remove the line below.
-      beforeDashboard: ['@/components/BeforeDashboard'],
-    },
-    importMap: {
-      baseDir: path.resolve(dirname),
+      // Feel free to delete this at any time. Simply remove the line below and the import `BeforeDashboard` statement on line 15.
+      beforeDashboard: ['@/components/BeforeDashboard#BeforeDashboard'],
     },
     user: Users.slug,
-    livePreview: {
-      breakpoints: [
-        {
-          label: 'Mobile',
-          name: 'mobile',
-          width: 375,
-          height: 667,
-        },
-        {
-          label: 'Tablet',
-          name: 'tablet',
-          width: 768,
-          height: 1024,
-        },
-        {
-          label: 'Desktop',
-          name: 'desktop',
-          width: 1440,
-          height: 900,
-        },
-      ],
-    },
   },
-  // This config helps us configure global or default features that the other editors can inherit
-  editor: defaultLexical,
+  collections: [Users, Pages, Artwork, Categories, Media],
   db: mongooseAdapter({
-    url: process.env.MONGODB_URI || process.env.DATABASE_URI || '',
+    url: process.env.DATABASE_URI || '',
   }),
-  collections: [About, Artwork, Products, Orders, Services, ServicesPage, /* Bookings, */ Pages, Posts, Media, Categories, Users],
-  cors: [getServerSideURL()].filter(Boolean),
+  editor: lexicalEditor({
+    features: () => {
+      return [
+        UnderlineFeature(),
+        BoldFeature(),
+        ItalicFeature(),
+        OrderedListFeature(),
+        UnorderedListFeature(),
+        LinkFeature({
+          enabledCollections: ['pages'],
+          fields: ({ defaultFields }) => {
+            const defaultFieldsWithoutUrl = defaultFields.filter((field) => {
+              if ('name' in field && field.name === 'url') return false
+              return true
+            })
+
+            return [
+              ...defaultFieldsWithoutUrl,
+              {
+                name: 'url',
+                type: 'text',
+                admin: {
+                  condition: ({ linkType }) => linkType !== 'internal',
+                },
+                label: ({ t }) => t('fields:enterURL'),
+                required: true,
+              },
+            ]
+          },
+        }),
+        IndentFeature(),
+        EXPERIMENTAL_TableFeature(),
+      ]
+    },
+  }),
+  //email: nodemailerAdapter(),
+  endpoints: [],
   globals: [Header, Footer],
   plugins: [
     ...plugins,
     // storage-adapter-placeholder
-    ...(process.env.USE_LOCAL_STORAGE === 'true' 
-      ? [] 
-      : [vercelBlobStorage({
-          enabled: true,
-          collections: {
-            media: true,
-          },
-          token: process.env.BLOB_READ_WRITE_TOKEN || '',
-          clientUploads: true, // Bypass Vercel's 4.5MB server upload limit
-        })]
-    ),
   ],
-  secret: process.env.PAYLOAD_SECRET,
-  sharp,
+  secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  jobs: {
-    access: {
-      run: ({ req }: { req: PayloadRequest }): boolean => {
-        // Allow logged in users to execute this endpoint (default)
-        if (req.user) return true
-
-        // If there is no logged in user, then check
-        // for the Vercel Cron secret to be present as an
-        // Authorization header:
-        const authHeader = req.headers.get('authorization')
-        return authHeader === `Bearer ${process.env.CRON_SECRET}`
-      },
-    },
-    tasks: [],
-  },
+  // Sharp is now an optional dependency -
+  // if you want to resize images, crop, set focal point, etc.
+  // make sure to install it and pass it to the config.
+  // sharp,
 })

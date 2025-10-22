@@ -1,10 +1,6 @@
-import tailwindcssAnimate from 'tailwindcss-animate'
-import typography from '@tailwindcss/typography'
-import forms from '@tailwindcss/forms'
-import aspectRatio from '@tailwindcss/aspect-ratio'
-
+const plugin = require('tailwindcss/plugin')
 /** @type {import('tailwindcss').Config} */
-const config = {
+export default {
   content: [
     './pages/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
@@ -12,8 +8,6 @@ const config = {
     './src/**/*.{ts,tsx}',
   ],
   darkMode: ['selector', '[data-theme="dark"]'],
-  plugins: [tailwindcssAnimate, typography, forms, aspectRatio],
-  prefix: '',
   safelist: [
     'lg:col-span-4',
     'lg:col-span-6',
@@ -48,10 +42,6 @@ const config = {
       },
     },
     extend: {
-      animation: {
-        'accordion-down': 'accordion-down 0.2s ease-out',
-        'accordion-up': 'accordion-up 0.2s ease-out',
-      },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
@@ -63,7 +53,7 @@ const config = {
           foreground: 'hsl(var(--accent-foreground))',
         },
         background: 'hsl(var(--background))',
-        border: 'hsla(var(--border))',
+        border: 'hsl(var(--border))',
         card: {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
@@ -95,11 +85,59 @@ const config = {
         error: 'hsl(var(--error))',
         warning: 'hsl(var(--warning))',
       },
+      typography: ({ theme }) => ({
+        DEFAULT: {
+          css: {
+            '--tw-prose-body': 'var(--text)',
+            '--tw-prose-headings': 'var(--text)',
+            h1: {
+              fontSize: '4rem',
+              fontWeight: 'normal',
+              marginBottom: '0.25em',
+            },
+            a: {
+              color: 'inherit',
+            },
+          },
+        },
+      }),
       fontFamily: {
         mono: ['var(--font-geist-mono)'],
         sans: ['var(--font-geist-sans)'],
       },
       keyframes: {
+        fadeIn: {
+          from: { opacity: 0 },
+          to: { opacity: 1 },
+        },
+        fadeOut: {
+          from: { opacity: 1 },
+          to: { opacity: 0 },
+        },
+        in: {
+          '0%': { transform: 'translateX(100%)' },
+          '100%': { transform: 'translateX(0%)' },
+        },
+        out: {
+          '0%': { transform: 'translateX(0%)' },
+          '100%': { transform: 'translateX(100%)' },
+        },
+        'slide-in-from-left': {
+          from: { transform: 'translateX(-100%)' },
+          to: { transform: 'translateX(0)' },
+        },
+        'slide-out-to-left': {
+          from: { transform: 'translateX(0)' },
+          to: { transform: 'translateX(-100%)' },
+        },
+        'slide-in-from-right': {
+          from: { transform: 'translateX(100%)' },
+          to: { transform: 'translateX(0)' },
+        },
+        'slide-out-to-right': {
+          from: { transform: 'translateX(0)' },
+          to: { transform: 'translateX(100%)' },
+        },
         'accordion-down': {
           from: { height: '0' },
           to: { height: 'var(--radix-accordion-content-height)' },
@@ -108,48 +146,51 @@ const config = {
           from: { height: 'var(--radix-accordion-content-height)' },
           to: { height: '0' },
         },
+        marquee: {
+          '0%': { transform: 'translateX(0%)' },
+          '100%': { transform: 'translateX(-100%)' },
+        },
+        blink: {
+          '0%': { opacity: 0.2 },
+          '20%': { opacity: 1 },
+          '100% ': { opacity: 0.2 },
+        },
       },
-      typography: () => ({
-        DEFAULT: {
-          css: [
-            {
-              '--tw-prose-body': 'var(--text)',
-              '--tw-prose-headings': 'var(--text)',
-              h1: {
-                fontWeight: 'normal',
-                marginBottom: '0.25em',
-              },
-            },
-          ],
-        },
-        base: {
-          css: [
-            {
-              h1: {
-                fontSize: '2.5rem',
-              },
-              h2: {
-                fontSize: '1.25rem',
-                fontWeight: 600,
-              },
-            },
-          ],
-        },
-        md: {
-          css: [
-            {
-              h1: {
-                fontSize: '3.5rem',
-              },
-              h2: {
-                fontSize: '1.5rem',
-              },
-            },
-          ],
-        },
-      }),
+      animation: {
+        in: 'in 0.2s ease-out',
+        out: 'out 0.2s ease-out',
+        fadeIn: 'fadeIn .3s ease-in-out',
+        fadeOut: 'fadeOut .3s ease-in-out',
+        carousel: 'marquee 60s linear infinite',
+        'slide-in-from-left': 'slide-in-from-left 0.2s ease-out',
+        'slide-out-to-left': 'slide-out-to-left 0.2s ease-out',
+        'slide-in-from-right': 'slide-in-from-right 0.2s ease-out',
+        'slide-out-to-right': 'slide-out-to-right 0.2s ease-out',
+        blink: 'blink 1.4s both infinite',
+        'accordion-down': 'accordion-down 0.2s ease-out',
+        'accordion-up': 'accordion-up 0.2s ease-out',
+      },
     },
   },
+  future: {
+    hoverOnlyWhenSupported: true,
+  },
+  plugins: [
+    require('@tailwindcss/container-queries'),
+    require('@tailwindcss/typography'),
+    plugin(({ matchUtilities, theme }) => {
+      matchUtilities(
+        {
+          'animation-delay': (value) => {
+            return {
+              'animation-delay': value,
+            }
+          },
+        },
+        {
+          values: theme('transitionDelay'),
+        },
+      )
+    }),
+  ],
 }
-
-export default config

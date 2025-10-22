@@ -1,12 +1,10 @@
-# Payload Website Template
+# Payload Ecommerce Template
 
-This is the official [Payload Website Template](https://github.com/payloadcms/payload/blob/main/templates/website). Use it to power websites, blogs, or portfolios from small to enterprise. This repo includes a fully-working backend, enterprise-grade admin panel, and a beautifully designed, production-ready website.
+This template is in **BETA**.
 
-This template is right for you if you are working on:
+This is the official [Payload Ecommerce Template](https://github.com/payloadcms/payload/blob/main/templates/ecommerce). This repo includes a fully-working backend, enterprise-grade admin panel, and a beautifully designed, production-ready ecommerce website.
 
-- A personal or enterprise-grade website, blog, or portfolio
-- A content publishing platform with a fully featured publication workflow
-- Exploring the capabilities of Payload
+This template is right for you if you are working on building an ecommerce project or shop with Payload.
 
 Core features:
 
@@ -18,10 +16,17 @@ Core features:
 - [Live Preview](#live-preview)
 - [On-demand Revalidation](#on-demand-revalidation)
 - [SEO](#seo)
-- [Search](#search)
-- [Redirects](#redirects)
+- [Search & Filters](#search)
 - [Jobs and Scheduled Publishing](#jobs-and-scheduled-publish)
 - [Website](#website)
+- [Products & Variants](#products-and-variants)
+- [User accounts](#user-accounts)
+- [Carts](#carts)
+- [Guest checkout](#guests)
+- [Orders & Transactions](#orders-and-transactions)
+- [Stripe Payments](#stripe)
+- [Currencies](#currencies)
+- [Automated Tests](#tests)
 
 ## Quick Start
 
@@ -31,24 +36,20 @@ To spin up this example locally, follow these steps:
 
 If you have not done so already, you need to have standalone copy of this repo on your machine. If you've already cloned this repo, skip to [Development](#development).
 
-#### Method 1 (recommended)
-
-Go to Payload Cloud and [clone this template](https://payloadcms.com/new/clone/website). This will create a new repository on your GitHub account with this template's code which you can then clone to your own machine.
-
-#### Method 2
+#### Method 1
 
 Use the `create-payload-app` CLI to clone this template directly to your machine:
 
 ```bash
-pnpx create-payload-app my-project -t website
+pnpx create-payload-app my-project -t ecommerce
 ```
 
-#### Method 3
+#### Method 2
 
 Use the `git` CLI to clone this template directly to your machine:
 
 ```bash
-git clone -n --depth=1 --filter=tree:0 https://github.com/payloadcms/payload my-project && cd my-project && git sparse-checkout set --no-cone templates/website && git checkout && rm -rf .git && git init && git add . && git mv -f templates/website/{.,}* . && git add . && git commit -m "Initial commit"
+git clone -n --depth=1 --filter=tree:0 https://github.com/payloadcms/payload my-project && cd my-project && git sparse-checkout set --no-cone templates/ecommerce && git checkout && rm -rf .git && git init && git add . && git mv -f templates/ecommerce/{.,}* . && git add . && git commit -m "Initial commit"
 ```
 
 ### Development
@@ -74,10 +75,6 @@ See the [Collections](https://payloadcms.com/docs/configuration/collections) doc
 
   For additional help, see the official [Auth Example](https://github.com/payloadcms/payload/tree/main/examples/auth) or the [Authentication](https://payloadcms.com/docs/authentication/overview#authentication-overview) docs.
 
-- #### Posts
-
-  Posts are used to generate blog posts, news articles, or any other type of content that is published over time. All posts are layout builder enabled so you can generate unique layouts for each post using layout-building blocks, see [Layout Builder](#layout-builder) for more details. Posts are also draft-enabled so you can preview them before publishing them to your website, see [Draft Preview](#draft-preview) for more details.
-
 - #### Pages
 
   All pages are layout builder enabled so you can generate unique layouts for each page using layout-building blocks, see [Layout Builder](#layout-builder) for more details. Pages are also draft-enabled so you can preview them before publishing them to your website, see [Draft Preview](#draft-preview) for more details.
@@ -88,7 +85,27 @@ See the [Collections](https://payloadcms.com/docs/configuration/collections) doc
 
 - #### Categories
 
-  A taxonomy used to group posts together. Categories can be nested inside of one another, for example "News > Technology". See the official [Payload Nested Docs Plugin](https://payloadcms.com/docs/plugins/nested-docs) for more details.
+  A taxonomy used to group products together.
+
+- ### Carts
+
+  Used to track user and guest carts within Payload. Added by the [ecommerce plugin](https://payloadcms.com/docs/ecommerce/plugin#carts).
+
+- ### Addresses
+
+  Saves user's addresses for easier checkout. Added by the [ecommerce plugin](https://payloadcms.com/docs/ecommerce/plugin#addresses).
+
+- ### Orders
+
+  Tracks orders once a transaction successfully completes. Added by the [ecommerce plugin](https://payloadcms.com/docs/ecommerce/plugin#orders).
+
+- ### Transactions
+
+  Tracks transactions from initiation to completion, once completed they will have a related Order item. Added by the [ecommerce plugin](https://payloadcms.com/docs/ecommerce/plugin#transactions).
+
+- ### Products and Variants
+
+  Primary collections for product details such as pricing per currency and optionally supports variants per product. Added by the [ecommerce plugin](https://payloadcms.com/docs/ecommerce/plugin#products).
 
 ### Globals
 
@@ -106,11 +123,19 @@ See the [Globals](https://payloadcms.com/docs/configuration/globals) docs for de
 
 Basic access control is setup to limit access to various content based based on publishing status.
 
-- `users`: Users can access the admin panel and create or edit content.
-- `posts`: Everyone can access published posts, but only users can create, update, or delete them.
-- `pages`: Everyone can access published pages, but only users can create, update, or delete them.
+- `users`: Users with the `admin` role can access the admin panel and create or edit content, users with the `customer` role can only access the frontend and the relevant collection items to themselves.
+- `pages`: Everyone can access published pages, but only admin users can create, update, or delete them.
+- `products` `variants`: Everyone can access published products, but only admin users can create, update, or delete them.
+- `carts`: Customers can access their own saved cart, guest users can access any unclaimed cart by ID.
+- `addresses`: Customers can access their own addresses for record keeping.
+- `transactions`: Only admins can access these as they're meant for internal tracking.
+- `orders`: Only admins and users who own the orders can access these.
 
 For more details on how to extend this functionality, see the [Payload Access Control](https://payloadcms.com/docs/access-control/overview#access-control) docs.
+
+## User accounts
+
+## Guests
 
 ## Layout Builder
 
@@ -130,9 +155,9 @@ A deep editorial experience that allows complete freedom to focus just on writin
 
 ## Draft Preview
 
-All posts and pages are draft-enabled so you can preview them before publishing them to your website. To do this, these collections use [Versions](https://payloadcms.com/docs/configuration/collections#versions) with `drafts` set to `true`. This means that when you create a new post, project, or page, it will be saved as a draft and will not be visible on your website until you publish it. This also means that you can preview your draft before publishing it to your website. To do this, we automatically format a custom URL which redirects to your front-end to securely fetch the draft version of your content.
+All products and pages are draft-enabled so you can preview them before publishing them to your website. To do this, these collections use [Versions](https://payloadcms.com/docs/configuration/collections#versions) with `drafts` set to `true`. This means that when you create a new product or page, it will be saved as a draft and will not be visible on your website until you publish it. This also means that you can preview your draft before publishing it to your website. To do this, we automatically format a custom URL which redirects to your front-end to securely fetch the draft version of your content.
 
-Since the front-end of this template is statically generated, this also means that pages, posts, and projects will need to be regenerated as changes are made to published documents. To do this, we use an `afterChange` hook to regenerate the front-end when a document has changed and its `_status` is `published`.
+Since the front-end of this template is statically generated, this also means that pages, products, and projects will need to be regenerated as changes are made to published documents. To do this, we use an `afterChange` hook to regenerate the front-end when a document has changed and its `_status` is `published`.
 
 For more details on how to extend this functionality, see the official [Draft Preview Example](https://github.com/payloadcms/payload/tree/examples/draft-preview).
 
@@ -142,7 +167,7 @@ In addition to draft previews you can also enable live preview to view your end 
 
 ## On-demand Revalidation
 
-We've added hooks to collections and globals so that all of your pages, posts, footer, or header changes will automatically be updated in the frontend via on-demand revalidation supported by Nextjs.
+We've added hooks to collections and globals so that all of your pages, products, footer, or header changes will automatically be updated in the frontend via on-demand revalidation supported by Nextjs.
 
 > Note: if an image has been changed, for example it's been cropped, you will need to republish the page it's used on in order to be able to revalidate the Nextjs image cache.
 
@@ -152,11 +177,45 @@ This template comes pre-configured with the official [Payload SEO Plugin](https:
 
 ## Search
 
-This template also pre-configured with the official [Payload Search Plugin](https://payloadcms.com/docs/plugins/search) to showcase how SSR search features can easily be implemented into Next.js with Payload. See [Website](#website) for more details.
+This template comes with SSR search features can easily be implemented into Next.js with Payload. See [Website](#website) for more details.
 
-## Redirects
+## Orders and Transactions
 
-If you are migrating an existing site or moving content to a new URL, you can use the `redirects` collection to create a proper redirect from old URLs to new ones. This will ensure that proper request status codes are returned to search engines and that your users are not left with a broken link. This template comes pre-configured with the official [Payload Redirects Plugin](https://payloadcms.com/docs/plugins/redirects) for complete redirect control from the admin panel. All redirects are fully integrated into the front-end website that comes with this template. See [Website](#website) for more details.
+Transactions are intended for keeping a record of any payment made, as such it will contain information regarding an order or billing address used or the payment method used and amount. Only admins can access transactions.
+
+An order is created only once a transaction is successfully completed. This is a record that the user who completed the transaction has access so they can keep track of their history. Guests can also access their own orders by providing an order ID and the email associated with that order.
+
+## Currencies
+
+By default the template ships with support only for USD however you can change the supported currencies via the [plugin configuration](https://payloadcms.com/docs/ecommerce/plugin#currencies). You will need to ensure that the supported currencies in Payload are also configured in your Payment platforms.
+
+## Stripe
+
+By default we ship with the Stripe adapter configured, so you'll need to setup the `secretKey`, `publishableKey` and `webhookSecret` from your Stripe dashboard. Follow [Stripe's guide](https://docs.stripe.com/get-started/api-request?locale=en-GB) on how to set this up.
+
+## Tests
+
+We provide automated tests out of the box for both E2E and Int tests along with this template. They are being run in our CI to ensure the stability of this template over time. You can integrate them into your CI or run them locally as well via:
+
+To run Int tests wtih Vitest:
+
+```bash
+pnpm test:int
+```
+
+To run E2Es with Playwright:
+
+```bash
+pnpm test:e2e
+```
+
+or
+
+```bash
+pnpm test
+```
+
+To run both.
 
 ## Jobs and Scheduled Publish
 
@@ -183,8 +242,8 @@ Core features:
 - Pre-made layout building blocks
 - SEO
 - Search
-- Redirects
 - Live preview
+- Stripe payments
 
 ### Cache
 
@@ -238,12 +297,12 @@ That's it! The Docker instance will help you get up and running quickly while al
 
 ### Seed
 
-To seed the database with a few pages, posts, and projects you can click the 'seed database' link from the admin panel.
+To seed the database with a few pages, products, and orders you can click the 'seed database' link from the admin panel.
 
 The seed script will also create a demo user for demonstration purposes only:
 
-- Demo Author
-  - Email: `demo-author@payloadcms.com`
+- Demo Customer
+  - Email: `customer@example.com`
   - Password: `password`
 
 > NOTICE: seeding the database is destructive because it drops your current database to populate a fresh one from the seed template. Only run this command if you are starting a new project or can afford to lose your current data.
@@ -255,10 +314,6 @@ To run Payload in production, you need to build and start the Admin panel. To do
 1. Invoke the `next build` script by running `pnpm build` or `npm run build` in your project root. This creates a `.next` directory with a production-ready admin bundle.
 1. Finally run `pnpm start` or `npm run start` to run Node in production and serve Payload from the `.build` directory.
 1. When you're ready to go live, see Deployment below for more details.
-
-### Deploying to Payload Cloud
-
-The easiest way to deploy your project is to use [Payload Cloud](https://payloadcms.com/new/import), a one-click hosting solution to deploy production-ready instances of your Payload apps directly from your GitHub repo.
 
 ### Deploying to Vercel
 
@@ -304,8 +359,6 @@ export default buildConfig({
   ],
   // ...
 ```
-
-There is also a simplified [one click deploy](https://github.com/payloadcms/payload/tree/templates/with-vercel-postgres) to Vercel should you need it.
 
 ### Self-hosting
 

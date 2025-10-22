@@ -1,27 +1,20 @@
 import type { CollectionConfig } from 'payload'
-import { authenticated } from '../access/authenticated'
-import { slugField } from '../fields/slug'
-import { populatePublishedAt } from '../hooks/populatePublishedAt'
-import { generatePreviewPath } from '../utilities/generatePreviewPath'
-import { revalidateArtwork, revalidateArtworkDelete } from '../hooks/revalidateArtwork'
+import { adminOnly } from '@/access/adminOnly'
+import { adminOrPublishedStatus } from '@/access/adminOrPublishedStatus'
+import { slugField } from 'payload'
 
 export const Artwork: CollectionConfig = {
   slug: 'artwork',
   access: {
-    create: authenticated,
-    delete: authenticated,
-    read: () => true, // Public access for portfolio
-    update: authenticated,
+    create: adminOnly,
+    delete: adminOnly,
+    read: adminOrPublishedStatus,
+    update: adminOnly,
   },
   admin: {
-    defaultColumns: ['title', 'series', 'year', 'updatedAt'],
+    group: 'Content',
+    defaultColumns: ['title', 'year', 'featured', '_status', 'updatedAt'],
     useAsTitle: 'title',
-    preview: (data) =>
-      generatePreviewPath({
-        slug: typeof data?.slug === 'string' ? data.slug : '',
-        collection: 'artwork',
-        req: {} as Parameters<typeof generatePreviewPath>[0]['req'],
-      }),
   },
   fields: [
     {
@@ -36,106 +29,164 @@ export const Artwork: CollectionConfig = {
       required: true,
     },
     {
-      name: 'series',
-      type: 'text',
-      admin: {
-        position: 'sidebar',
-      },
-    },
-    {
-      name: 'year',
-      type: 'number',
-      admin: {
-        position: 'sidebar',
-      },
-    },
-    {
       name: 'description',
-      type: 'textarea',
+      type: 'richText',
+      required: false,
     },
     {
-      name: 'medium',
-      type: 'text',
-      admin: {
-        position: 'sidebar',
-      },
-    },
-    {
-      name: 'dimensions',
-      type: 'text',
-      admin: {
-        position: 'sidebar',
-      },
-    },
-    {
-      name: 'location',
-      type: 'text',
-      admin: {
-        position: 'sidebar',
-      },
-    },
-    {
-      name: 'camera',
-      type: 'text',
-      admin: {
-        position: 'sidebar',
-      },
-    },
-    {
-      name: 'lens',
-      type: 'text',
-      admin: {
-        position: 'sidebar',
-      },
-    },
-    {
-      name: 'settings',
-      type: 'group',
-      admin: {
-        position: 'sidebar',
-      },
+      type: 'row',
       fields: [
         {
-          name: 'aperture',
+          name: 'series',
           type: 'text',
+          admin: {
+            width: '50%',
+          },
         },
         {
-          name: 'shutter',
-          type: 'text',
-        },
-        {
-          name: 'iso',
+          name: 'year',
           type: 'number',
+          admin: {
+            width: '50%',
+          },
         },
       ],
     },
     {
-      name: 'featured',
-      type: 'checkbox',
-      admin: {
-        position: 'sidebar',
-      },
-      defaultValue: false,
+      type: 'row',
+      fields: [
+        {
+          name: 'medium',
+          type: 'text',
+          admin: {
+            width: '50%',
+          },
+        },
+        {
+          name: 'dimensions',
+          type: 'text',
+          admin: {
+            width: '50%',
+            placeholder: 'e.g., 24 x 36 inches',
+          },
+        },
+      ],
     },
     {
-      name: 'publishedAt',
-      type: 'date',
+      type: 'collapsible',
+      label: 'Photography Details',
+      fields: [
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'camera',
+              type: 'text',
+              admin: {
+                width: '50%',
+              },
+            },
+            {
+              name: 'lens',
+              type: 'text',
+              admin: {
+                width: '50%',
+              },
+            },
+          ],
+        },
+        {
+          name: 'location',
+          type: 'text',
+        },
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'aperture',
+              type: 'text',
+              admin: {
+                width: '33.33%',
+                placeholder: 'e.g., f/2.8',
+              },
+            },
+            {
+              name: 'shutter',
+              type: 'text',
+              admin: {
+                width: '33.33%',
+                placeholder: 'e.g., 1/250s',
+              },
+            },
+            {
+              name: 'iso',
+              type: 'number',
+              admin: {
+                width: '33.33%',
+                placeholder: 'e.g., 400',
+              },
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'availablePrints',
+      type: 'relationship',
+      relationTo: 'products',
+      hasMany: true,
       admin: {
-        position: 'sidebar',
+        description: 'Link available print products to this artwork',
       },
     },
-    ...slugField(),
+    {
+      type: 'row',
+      fields: [
+        {
+          name: 'featured',
+          type: 'checkbox',
+          defaultValue: false,
+          admin: {
+            width: '50%',
+          },
+        },
+        {
+          name: 'publishedAt',
+          type: 'date',
+          admin: {
+            date: {
+              pickerAppearance: 'dayAndTime',
+            },
+            width: '50%',
+          },
+          hooks: {
+            beforeChange: [
+              ({ siblingData, value }) => {
+                if (siblingData._status === 'published' && !value) {
+                  return new Date()
+                }
+                return value
+              },
+            ],
+          },
+        },
+      ],
+    },
+    slugField(),
   ],
   hooks: {
-    beforeChange: [populatePublishedAt],
-    afterChange: [revalidateArtwork],
-    afterDelete: [revalidateArtworkDelete],
+    beforeChange: [
+      ({ data }) => {
+        if (data._status === 'published' && !data.publishedAt) {
+          data.publishedAt = new Date()
+        }
+        return data
+      },
+    ],
   },
   versions: {
     drafts: {
-      autosave: {
-        interval: 100,
-      },
+      autosave: true,
     },
     maxPerDoc: 50,
   },
