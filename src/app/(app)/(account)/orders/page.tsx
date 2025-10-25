@@ -35,7 +35,7 @@ export default async function Orders() {
     })
 
     orders = ordersResult?.docs || []
-  } catch (error) {}
+  } catch (_error) {}
 
   return (
     <>
@@ -47,7 +47,7 @@ export default async function Orders() {
 
         {orders && orders.length > 0 && (
           <ul className="flex flex-col gap-6">
-            {orders?.map((order, index) => (
+            {orders?.map((order) => (
               <li key={order.id}>
                 <OrderItem order={order} />
               </li>

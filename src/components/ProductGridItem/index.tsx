@@ -1,4 +1,4 @@
-import type { Product, Variant } from '@/payload-types'
+import type { Product } from '@/payload-types'
 
 import Link from 'next/link'
 import React from 'react'

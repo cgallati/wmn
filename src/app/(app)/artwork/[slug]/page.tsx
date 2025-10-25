@@ -1,4 +1,4 @@
-import type { Artwork, Media } from '@/payload-types'
+import type { Artwork } from '@/payload-types'
 import { ArtworkDetail } from '@/components/ArtworkDetail'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'

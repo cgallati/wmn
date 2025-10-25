@@ -35,6 +35,8 @@ export default async function ShopPage({ searchParams }: Props) {
       inventory: true,
       enableVariants: true,
       variants: true,
+      updatedAt: true,
+      createdAt: true,
     },
     ...(sort ? { sort } : { sort: 'title' }),
     where: {

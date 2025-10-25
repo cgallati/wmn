@@ -1,23 +1,23 @@
 import type { Metadata } from 'next'
 
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
-import React, { Fragment } from 'react'
+import React, { Suspense } from 'react'
 import { ConfirmOrder } from '@/components/checkout/ConfirmOrder'
+import { LoadingSpinner } from '@/components/LoadingSpinner'
 
-type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
-
-export default async function ConfirmOrderPage({
-  searchParams: searchParamsPromise,
-}: {
-  searchParams: SearchParams
-}) {
-  const searchParams = await searchParamsPromise
-
-  const paymentIntent = searchParams.paymentId
-
+export default async function ConfirmOrderPage() {
   return (
     <div className="container min-h-[90vh] flex py-12">
-      <ConfirmOrder />
+      <Suspense
+        fallback={
+          <div className="text-center w-full flex flex-col items-center justify-start gap-4">
+            <h1 className="text-2xl">Loading...</h1>
+            <LoadingSpinner className="w-12 h-6" />
+          </div>
+        }
+      >
+        <ConfirmOrder />
+      </Suspense>
     </div>
   )
 }
