@@ -34,26 +34,26 @@ export function ArtworkDetail({ artwork }: ArtworkDetailProps) {
         <div className="space-y-3 border-t border-b py-6">
           {artwork.year && (
             <div className="grid grid-cols-3 gap-4">
-              <span className="text-sm font-medium text-muted-foreground">Year</span>
-              <span className="col-span-2 text-sm">{artwork.year}</span>
+              <span className="text-sm font-medium text-neutral-600">Year</span>
+              <span className="col-span-2 text-sm text-neutral-900">{artwork.year}</span>
             </div>
           )}
           {artwork.medium && (
             <div className="grid grid-cols-3 gap-4">
-              <span className="text-sm font-medium text-muted-foreground">Medium</span>
-              <span className="col-span-2 text-sm">{artwork.medium}</span>
+              <span className="text-sm font-medium text-neutral-600">Medium</span>
+              <span className="col-span-2 text-sm text-neutral-900">{artwork.medium}</span>
             </div>
           )}
           {artwork.dimensions && (
             <div className="grid grid-cols-3 gap-4">
-              <span className="text-sm font-medium text-muted-foreground">Dimensions</span>
-              <span className="col-span-2 text-sm">{artwork.dimensions}</span>
+              <span className="text-sm font-medium text-neutral-600">Dimensions</span>
+              <span className="col-span-2 text-sm text-neutral-900">{artwork.dimensions}</span>
             </div>
           )}
           {artwork.location && (
             <div className="grid grid-cols-3 gap-4">
-              <span className="text-sm font-medium text-muted-foreground">Location</span>
-              <span className="col-span-2 text-sm">{artwork.location}</span>
+              <span className="text-sm font-medium text-neutral-600">Location</span>
+              <span className="col-span-2 text-sm text-neutral-900">{artwork.location}</span>
             </div>
           )}
 
@@ -66,20 +66,20 @@ export function ArtworkDetail({ artwork }: ArtworkDetailProps) {
             <>
               {artwork.camera && (
                 <div className="grid grid-cols-3 gap-4">
-                  <span className="text-sm font-medium text-muted-foreground">Camera</span>
-                  <span className="col-span-2 text-sm">{artwork.camera}</span>
+                  <span className="text-sm font-medium text-neutral-600">Camera</span>
+                  <span className="col-span-2 text-sm text-neutral-900">{artwork.camera}</span>
                 </div>
               )}
               {artwork.lens && (
                 <div className="grid grid-cols-3 gap-4">
-                  <span className="text-sm font-medium text-muted-foreground">Lens</span>
-                  <span className="col-span-2 text-sm">{artwork.lens}</span>
+                  <span className="text-sm font-medium text-neutral-600">Lens</span>
+                  <span className="col-span-2 text-sm text-neutral-900">{artwork.lens}</span>
                 </div>
               )}
               {(artwork.aperture || artwork.shutter || artwork.iso) && (
                 <div className="grid grid-cols-3 gap-4">
-                  <span className="text-sm font-medium text-muted-foreground">Settings</span>
-                  <span className="col-span-2 text-sm">
+                  <span className="text-sm font-medium text-neutral-600">Settings</span>
+                  <span className="col-span-2 text-sm text-neutral-900">
                     {[
                       artwork.aperture,
                       artwork.shutter,
@@ -121,7 +121,7 @@ export function ArtworkDetail({ artwork }: ArtworkDetailProps) {
           {/* Title Section */}
           <div className="space-y-2">
             <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{artwork.title}</h1>
-            <div className="flex gap-4 text-muted-foreground">
+            <div className="flex gap-4 text-neutral-700">
               {artwork.series && <span className="text-lg">{artwork.series}</span>}
               {artwork.year && artwork.series && <span className="text-lg">•</span>}
               {artwork.year && <span className="text-lg">{artwork.year}</span>}
@@ -167,7 +167,7 @@ export function ArtworkDetail({ artwork }: ArtworkDetailProps) {
             <div>
               <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{artwork.title}</h1>
               {artwork.series && (
-                <p className="mt-2 text-lg text-muted-foreground">{artwork.series}</p>
+                <p className="mt-2 text-lg text-neutral-700">{artwork.series}</p>
               )}
             </div>
 
