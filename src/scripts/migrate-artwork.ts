@@ -22,12 +22,12 @@
 import { MongoClient } from 'mongodb'
 import { getPayload } from 'payload'
 import config from '@payload-config'
-import * as dotenv from 'dotenv'
+import { config as dotenvConfig } from 'dotenv'
 
 // Load environment variables
 // Load .env.local first (takes priority), then .env as fallback
-dotenv.config({ path: '.env.local' })
-dotenv.config() // This won't override existing variables
+dotenvConfig({ path: '.env.local' })
+dotenvConfig() // This won't override existing variables
 
 // Configuration
 const OLD_DATABASE_URI = process.env.OLD_DATABASE_URI
