@@ -25,11 +25,14 @@ import config from '@payload-config'
 import * as dotenv from 'dotenv'
 
 // Load environment variables
-dotenv.config()
+// Load .env.local first (takes priority), then .env as fallback
+dotenv.config({ path: '.env.local' })
+dotenv.config() // This won't override existing variables
 
 // Configuration
 const OLD_DATABASE_URI = process.env.OLD_DATABASE_URI
 const NEW_DATABASE_URI = process.env.DATABASE_URI
+const PAYLOAD_SECRET = process.env.PAYLOAD_SECRET
 const DRY_RUN = process.env.DRY_RUN === 'true'
 
 // Colors for console output
@@ -95,7 +98,8 @@ async function fetchOldArtwork(client: MongoClient): Promise<OldArtwork[]> {
   log('\n📥 Fetching artwork from old database...', 'cyan')
 
   const db = client.db()
-  const artwork = await db.collection('artwork').find({}).toArray()
+  // Note: Old database used 'artworks' (plural), new uses 'artwork' (singular)
+  const artwork = await db.collection('artworks').find({}).toArray()
 
   log(`✓ Found ${artwork.length} artwork documents`, 'green')
 
@@ -150,13 +154,18 @@ async function migrateArtwork(oldArtwork: OldArtwork[], stats: MigrationStats) {
         log(`  ✓ Would create: ${artwork.title}`, 'yellow')
         stats.skipped++
       } else {
-        // Create via Payload API
+        // Create via Payload API as draft with validation bypassed
         const created = await payload.create({
           collection: 'artwork',
-          data: newArtworkData,
+          data: {
+            ...newArtworkData,
+            _status: 'draft', // Always create as draft for review
+          },
+          overrideAccess: true, // Bypass access control
+          draft: true, // Create as draft
         })
 
-        log(`  ✓ Created with ID: ${created.id}`, 'green')
+        log(`  ✓ Created with ID: ${created.id} (draft)`, 'green')
         stats.success++
       }
     } catch (error) {
@@ -226,12 +235,18 @@ async function main() {
     // Validate environment
     if (!OLD_DATABASE_URI) {
       throw new Error(
-        'OLD_DATABASE_URI is not set. Please add it to your .env file:\nOLD_DATABASE_URI=mongodb://...',
+        'OLD_DATABASE_URI is not set. Please add it to your .env.local file:\nOLD_DATABASE_URI=mongodb://...',
       )
     }
 
     if (!NEW_DATABASE_URI) {
-      throw new Error('DATABASE_URI is not set. Please check your .env file.')
+      throw new Error('DATABASE_URI is not set. Please check your .env.local file.')
+    }
+
+    if (!PAYLOAD_SECRET) {
+      throw new Error(
+        'PAYLOAD_SECRET is not set. Please check your .env.local file.\nMake sure you are using the production secret when migrating to production database.',
+      )
     }
 
     // Connect to old database
