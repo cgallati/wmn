@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   description: 'Photography Portfolio',
 }
 
+// Revalidate every hour to ensure fresh data
+export const revalidate = 3600
+
 export default async function HomePage() {
   const { isEnabled: draft } = await draftMode()
   const payload = await getPayload({ config: configPromise })
@@ -16,12 +19,12 @@ export default async function HomePage() {
   const result = await payload.find({
     collection: 'artwork',
     depth: 1,
-    draft,
+    draft: draft,
     limit: 100,
     overrideAccess: draft,
     sort: '-publishedAt',
     where: {
-      ...(draft ? {} : { _status: { equals: 'published' } }),
+      _status: { equals: 'published' },
     },
   })
 
