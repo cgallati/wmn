@@ -28,7 +28,12 @@ export function Portfolio({ artwork }: PortfolioProps) {
             <Link
               key={item.id}
               href={`/artwork/${item.slug}`}
-              className="group relative aspect-square overflow-hidden rounded-lg bg-muted"
+              className="group relative overflow-hidden rounded-lg bg-muted"
+              style={{
+                aspectRatio: image?.width && image?.height
+                  ? `${image.width} / ${image.height}`
+                  : '1 / 1'
+              }}
             >
               {image && (
                 <Media
