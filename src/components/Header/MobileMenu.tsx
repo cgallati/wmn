@@ -60,8 +60,13 @@ export function MobileMenu({ menu }: Props) {
           {menu?.length ? (
             <ul className="flex w-full flex-col">
               {menu.map((item) => (
-                <li className="py-2" key={item.id}>
+                <li className="py-2 flex items-start gap-2" key={item.id}>
                   <CMSLink {...item.link} appearance="link" />
+                  {item.showExplicitBadge && (
+                    <span className="inline-block bg-red-600 text-white text-[0.5rem] font-bold tracking-wider px-1.5 py-0.5 leading-none mt-2">
+                      EXPLICIT CONTENT
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>

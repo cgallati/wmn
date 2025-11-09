@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 
 import { RenderBlocks } from '@/blocks/RenderBlocks'
-import { RenderHero } from '@/heros/RenderHero'
 import { generateMeta } from '@/utilities/generateMeta'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
@@ -58,11 +57,14 @@ export default async function Page({ params }: Args) {
     return notFound()
   }
 
-  const { hero, layout } = page
+  const { layout } = page
+
+  // Check if first block is fullscreen carousel to remove padding
+  const hasFullscreenCarouselFirst = layout?.[0]?.blockType === 'carousel' &&
+                                      (layout[0] as any).displayMode === 'fullscreen'
 
   return (
-    <article className="pt-16 pb-24">
-      <RenderHero {...hero} />
+    <article className={hasFullscreenCarouselFirst ? '' : 'pt-16 pb-24'}>
       <RenderBlocks blocks={layout} />
     </article>
   )

@@ -4,6 +4,22 @@ export const Carousel: Block = {
   slug: 'carousel',
   fields: [
     {
+      name: 'displayMode',
+      type: 'select',
+      defaultValue: 'standard',
+      label: 'Display Mode',
+      options: [
+        {
+          label: 'Standard',
+          value: 'standard',
+        },
+        {
+          label: 'Fullscreen',
+          value: 'fullscreen',
+        },
+      ],
+    },
+    {
       name: 'populateBy',
       type: 'select',
       defaultValue: 'collection',
@@ -30,6 +46,10 @@ export const Carousel: Block = {
         {
           label: 'Products',
           value: 'products',
+        },
+        {
+          label: 'Artwork',
+          value: 'artwork',
         },
       ],
     },
@@ -61,7 +81,7 @@ export const Carousel: Block = {
       },
       hasMany: true,
       label: 'Selection',
-      relationTo: ['products'],
+      relationTo: ['products', 'artwork'],
     },
     {
       name: 'populatedDocs',
@@ -73,7 +93,7 @@ export const Carousel: Block = {
       },
       hasMany: true,
       label: 'Populated Docs',
-      relationTo: ['products'],
+      relationTo: ['products', 'artwork'],
     },
     {
       name: 'populatedDocsTotal',

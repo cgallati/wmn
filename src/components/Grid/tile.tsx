@@ -9,7 +9,7 @@ type Props = {
   active?: boolean
   isInteractive?: boolean
   label?: {
-    amount: number
+    amount?: number
     position?: 'bottom' | 'center'
     title: string
   }

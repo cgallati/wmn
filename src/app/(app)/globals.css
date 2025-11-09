@@ -22,7 +22,7 @@
 }
 
 @theme {
-  --font-sans: var(--font-geist-sans), sans-serif;
+  --font-sans: "neue-haas-grotesk-display", sans-serif;
   --font-mono: var(--font-geist-mono), sans-serif;
 }
 
@@ -130,4 +130,26 @@ a,
 input,
 button {
   @apply focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50;
+}
+
+/* Fix prose text colors for light theme */
+@layer base {
+  .prose {
+    --tw-prose-body: hsl(222.2 84% 4.9%);
+    --tw-prose-headings: hsl(222.2 84% 4.9%);
+    --tw-prose-lead: hsl(222.2 84% 4.9%);
+    --tw-prose-links: hsl(222.2 47.4% 11.2%);
+    --tw-prose-bold: hsl(222.2 84% 4.9%);
+    --tw-prose-counters: hsl(222.2 84% 4.9%);
+    --tw-prose-bullets: hsl(222.2 84% 4.9%);
+    --tw-prose-hr: hsl(240 6% 90%);
+    --tw-prose-quotes: hsl(222.2 84% 4.9%);
+    --tw-prose-quote-borders: hsl(240 6% 90%);
+    --tw-prose-captions: hsl(222.2 84% 4.9%);
+    --tw-prose-code: hsl(222.2 84% 4.9%);
+    --tw-prose-pre-code: hsl(222.2 84% 4.9%);
+    --tw-prose-pre-bg: hsl(240 5% 96%);
+    --tw-prose-th-borders: hsl(240 6% 90%);
+    --tw-prose-td-borders: hsl(240 6% 90%);
+  }
 }

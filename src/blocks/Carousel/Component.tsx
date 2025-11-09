@@ -1,4 +1,4 @@
-import type { Product, CarouselBlock as CarouselBlockProps } from '@/payload-types'
+import type { Product, Artwork, CarouselBlock as CarouselBlockProps } from '@/payload-types'
 
 import configPromise from '@payload-config'
 import { DefaultDocumentIDType, getPayload } from 'payload'
@@ -11,47 +11,70 @@ export const CarouselBlock: React.FC<
     id?: DefaultDocumentIDType
   }
 > = async (props) => {
-  const { id, categories, limit = 3, populateBy, selectedDocs } = props
+  const { id, categories, limit = 3, populateBy, selectedDocs, relationTo, displayMode = 'standard' } = props
 
-  let products: Product[] = []
+  let items: (Product | Artwork)[] = []
 
   if (populateBy === 'collection') {
     const payload = await getPayload({ config: configPromise })
 
-    const flattenedCategories = categories?.length
-      ? categories.map((category) => {
-          if (typeof category === 'object') return category.id
-          else return category
-        })
-      : null
+    const collection = relationTo || 'products'
 
-    const fetchedProducts = await payload.find({
-      collection: 'products',
-      depth: 1,
-      limit: limit || undefined,
-      ...(flattenedCategories && flattenedCategories.length > 0
-        ? {
-            where: {
-              categories: {
-                in: flattenedCategories,
+    if (collection === 'products') {
+      const flattenedCategories = categories?.length
+        ? categories.map((category) => {
+            if (typeof category === 'object') return category.id
+            else return category
+          })
+        : null
+
+      const fetchedProducts = await payload.find({
+        collection: 'products',
+        depth: 1,
+        limit: limit || undefined,
+        ...(flattenedCategories && flattenedCategories.length > 0
+          ? {
+              where: {
+                categories: {
+                  in: flattenedCategories,
+                },
               },
-            },
-          }
-        : {}),
-    })
+            }
+          : {}),
+      })
 
-    products = fetchedProducts.docs
+      items = fetchedProducts.docs
+    } else if (collection === 'artwork') {
+      const fetchedArtwork = await payload.find({
+        collection: 'artwork',
+        depth: 1,
+        limit: limit || undefined,
+        where: {
+          _status: {
+            equals: 'published',
+          },
+        },
+        sort: '-publishedAt',
+      })
+
+      items = fetchedArtwork.docs
+    }
   } else if (selectedDocs?.length) {
-    products = selectedDocs.map((post) => {
-      if (typeof post.value !== 'string') return post.value
-    }) as Product[]
+    items = selectedDocs.map((doc) => {
+      if (typeof doc.value !== 'string') return doc.value
+    }).filter(Boolean) as (Product | Artwork)[]
   }
 
-  if (!products?.length) return null
+  if (!items?.length) return null
+
+  // For fullscreen mode, don't wrap in a container
+  if (displayMode === 'fullscreen') {
+    return <CarouselClient items={items} displayMode="fullscreen" />
+  }
 
   return (
-    <div className=" w-full pb-6 pt-1">
-      <CarouselClient products={products} />
+    <div className="w-full pb-6 pt-1">
+      <CarouselClient items={items} displayMode="standard" />
     </div>
   )
 }

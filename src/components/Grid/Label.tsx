@@ -4,7 +4,7 @@ import React from 'react'
 import { Price } from '@/components/Price'
 
 type Props = {
-  amount: number
+  amount?: number
   position?: 'bottom' | 'center'
   title: string
 }
@@ -21,11 +21,13 @@ export const Label: React.FC<Props> = ({ amount, position = 'bottom', title }) =
           {title}
         </h3>
 
-        <Price
-          amount={amount}
-          className="flex-none rounded-full bg-blue-600 p-2 text-white"
-          currencyCodeClassName="hidden @[275px]/label:inline"
-        />
+        {amount !== undefined && (
+          <Price
+            amount={amount}
+            className="flex-none rounded-full bg-blue-600 p-2 text-white"
+            currencyCodeClassName="hidden @[275px]/label:inline"
+          />
+        )}
       </div>
     </div>
   )

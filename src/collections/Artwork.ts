@@ -147,7 +147,16 @@ export const Artwork: CollectionConfig = {
           type: 'checkbox',
           defaultValue: false,
           admin: {
-            width: '50%',
+            width: '33.33%',
+          },
+        },
+        {
+          name: 'darkBackground',
+          type: 'checkbox',
+          defaultValue: false,
+          admin: {
+            width: '33.33%',
+            description: 'Enable if image has a dark background (for carousel UI)',
           },
         },
         {
@@ -157,7 +166,7 @@ export const Artwork: CollectionConfig = {
             date: {
               pickerAppearance: 'dayAndTime',
             },
-            width: '50%',
+            width: '33.33%',
           },
           hooks: {
             beforeChange: [

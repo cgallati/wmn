@@ -39,8 +39,11 @@ export const RenderBlocks: React.FC<{
             const Block = blockComponents[blockType]
 
             if (Block) {
+              // Don't add margin for fullscreen carousels
+              const isFullscreenCarousel = blockType === 'carousel' && (block as any).displayMode === 'fullscreen'
+
               return (
-                <div className="my-16" key={index}>
+                <div className={isFullscreenCarousel ? '' : 'my-16'} key={index}>
                   {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
                   {/* @ts-ignore - weird type mismatch here */}
                   <Block id={toKebabCase(blockName!)} {...block} />

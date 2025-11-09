@@ -168,6 +168,23 @@ The project uses granular access control functions:
    - Access control functions configured
    - Requires env vars: `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOKS_SIGNING_SECRET`
 
+### Site Layout
+
+The site uses a **vertical sidebar navigation** layout:
+
+- **Sidebar** (`src/components/Header/`): Fixed left sidebar containing:
+  - Logo at top
+  - Vertical navigation menu (from Header global)
+  - Cart button at bottom
+  - Width: 256px (16rem)
+  - Sticky positioning for scroll persistence
+
+- **Main Content Area**: Flex-grow layout taking remaining width
+  - All page content renders in this area
+  - Responsive on mobile (sidebar may collapse)
+
+The layout is defined in `src/app/(app)/layout.tsx` with a flex container. The Header component detects `vertical` prop to render in sidebar mode instead of traditional horizontal header.
+
 ### Blocks System
 
 The project uses a flexible blocks system for page layouts:
@@ -175,7 +192,15 @@ The project uses a flexible blocks system for page layouts:
 - **Archive** (`src/blocks/ArchiveBlock/`): Display collections of content
 - **Banner** (`src/blocks/Banner/`): Promotional banners
 - **CallToAction** (`src/blocks/CallToAction/`): CTA buttons/sections
-- **Carousel** (`src/blocks/Carousel/`): Image/content carousels with auto-scroll
+- **Carousel** (`src/blocks/Carousel/`): Image/content carousels with two display modes:
+  - **Standard Mode**: Auto-scrolling horizontal carousel for products/artwork
+  - **Fullscreen Mode**: Full-screen immersive gallery with:
+    - Click zones (left 50% = previous, right 50% = next)
+    - Dot navigation at bottom
+    - Images scaled to fill screen while maintaining aspect ratio
+    - Touch/swipe support for mobile
+  - Supports both **Products** and **Artwork** collections
+  - Configurable via CMS: collection selection, display mode, populate by collection or individual selection
 - **Code** (`src/blocks/Code/`): Code snippets with syntax highlighting
 - **Content** (`src/blocks/Content/`): Rich text content blocks
 - **Form** (`src/blocks/Form/`): Dynamic forms with validation
@@ -188,7 +213,7 @@ Blocks are rendered via `src/blocks/RenderBlocks.tsx`.
 
 **App Router Organization**:
 - `(app)/`: Main frontend routes
-  - `/page.tsx`: Homepage
+  - `/page.tsx`: Homepage (fetches page with slug='home' from Pages collection)
   - `/[slug]/page.tsx`: Dynamic pages (from Pages collection)
   - `/products/[slug]/page.tsx`: Product detail pages
   - `/shop/page.tsx`: Shop/catalog page
@@ -272,6 +297,7 @@ Recreate the portfolio functionality from `../archive/wmn`:
 - **Portfolio Grid**: Responsive grid layout with hover effects
 - **Artwork Detail Pages**: Full image view with complete metadata
 - **Integration**: Link artwork to available print products
+- **Homepage Gallery**: Fullscreen carousel of selected artwork, configurable via CMS
 
 ### Ecommerce Requirements
 Use Payload's native ecommerce plugin for:
@@ -281,6 +307,29 @@ Use Payload's native ecommerce plugin for:
 - **Stripe Integration**: Secure payment processing
 - **Order Management**: Track orders and transactions
 - **Customer Accounts**: Allow customers to view order history
+
+## Homepage Configuration
+
+The homepage (`/`) is powered by the Pages collection with `slug: 'home'`:
+
+1. **Create/Edit Home Page** in Payload Admin:
+   - Navigate to Pages collection
+   - Find or create page with slug `home`
+
+2. **Add Carousel Block** to Content Layout:
+   - Click "Add Layout" and select "Carousel"
+   - Set **Display Mode**: `Fullscreen` for immersive gallery or `Standard` for traditional carousel
+   - Set **Populate By**:
+     - `Collection` to automatically show all artwork
+     - `Individual Selection` to manually pick specific pieces
+   - Set **Collections To Show**: Choose `Artwork` or `Products`
+   - Configure additional options (categories, limit, etc.)
+
+3. **Save and Publish** the Home page
+
+The homepage will automatically render the configured blocks with fullscreen carousel navigation.
+
+**Note**: Hero sections have been removed from the Pages collection. Pages now start directly with content blocks.
 
 ## Database Migrations
 

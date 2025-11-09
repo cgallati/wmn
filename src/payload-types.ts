@@ -321,7 +321,7 @@ export interface Product {
  */
 export interface Media {
   id: string;
-  alt: string;
+  alt?: string | null;
   caption?: {
     root: {
       type: string;
@@ -434,44 +434,6 @@ export interface Page {
   id: string;
   title: string;
   publishedOn?: string | null;
-  hero: {
-    type: 'none' | 'highImpact' | 'mediumImpact' | 'lowImpact';
-    richText?: {
-      root: {
-        type: string;
-        children: {
-          type: any;
-          version: number;
-          [k: string]: unknown;
-        }[];
-        direction: ('ltr' | 'rtl') | null;
-        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-        indent: number;
-        version: number;
-      };
-      [k: string]: unknown;
-    } | null;
-    links?:
-      | {
-          link: {
-            type?: ('reference' | 'custom') | null;
-            newTab?: boolean | null;
-            reference?: {
-              relationTo: 'pages';
-              value: string | Page;
-            } | null;
-            url?: string | null;
-            label: string;
-            /**
-             * Choose how the link should be rendered.
-             */
-            appearance?: ('default' | 'outline') | null;
-          };
-          id?: string | null;
-        }[]
-      | null;
-    media?: (string | null) | Media;
-  };
   layout: (
     | CallToActionBlock
     | ContentBlock
@@ -608,24 +570,37 @@ export interface Category {
  * via the `definition` "CarouselBlock".
  */
 export interface CarouselBlock {
+  displayMode?: ('standard' | 'fullscreen') | null;
   populateBy?: ('collection' | 'selection') | null;
-  relationTo?: 'products' | null;
+  relationTo?: ('products' | 'artwork') | null;
   categories?: (string | Category)[] | null;
   limit?: number | null;
   selectedDocs?:
-    | {
-        relationTo: 'products';
-        value: string | Product;
-      }[]
+    | (
+        | {
+            relationTo: 'products';
+            value: string | Product;
+          }
+        | {
+            relationTo: 'artwork';
+            value: string | Artwork;
+          }
+      )[]
     | null;
   /**
    * This field is auto-populated after-read
    */
   populatedDocs?:
-    | {
-        relationTo: 'products';
-        value: string | Product;
-      }[]
+    | (
+        | {
+            relationTo: 'products';
+            value: string | Product;
+          }
+        | {
+            relationTo: 'artwork';
+            value: string | Artwork;
+          }
+      )[]
     | null;
   /**
    * This field is auto-populated after-read
@@ -634,6 +609,58 @@ export interface CarouselBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'carousel';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "artwork".
+ */
+export interface Artwork {
+  id: string;
+  title: string;
+  image: string | Media;
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  series?: string | null;
+  year?: number | null;
+  medium?: string | null;
+  dimensions?: string | null;
+  camera?: string | null;
+  lens?: string | null;
+  location?: string | null;
+  aperture?: string | null;
+  shutter?: string | null;
+  iso?: number | null;
+  /**
+   * Link available print products to this artwork
+   */
+  availablePrints?: (string | Product)[] | null;
+  featured?: boolean | null;
+  /**
+   * Enable if image has a dark background (for carousel UI)
+   */
+  darkBackground?: boolean | null;
+  publishedAt?: string | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1017,54 +1044,6 @@ export interface Address {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "artwork".
- */
-export interface Artwork {
-  id: string;
-  title: string;
-  image: string | Media;
-  description?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  series?: string | null;
-  year?: number | null;
-  medium?: string | null;
-  dimensions?: string | null;
-  camera?: string | null;
-  lens?: string | null;
-  location?: string | null;
-  aperture?: string | null;
-  shutter?: string | null;
-  iso?: number | null;
-  /**
-   * Link available print products to this artwork
-   */
-  availablePrints?: (string | Product)[] | null;
-  featured?: boolean | null;
-  publishedAt?: string | null;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug: string;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "form-submissions".
  */
 export interface FormSubmission {
@@ -1223,28 +1202,6 @@ export interface UsersSelect<T extends boolean = true> {
 export interface PagesSelect<T extends boolean = true> {
   title?: T;
   publishedOn?: T;
-  hero?:
-    | T
-    | {
-        type?: T;
-        richText?: T;
-        links?:
-          | T
-          | {
-              link?:
-                | T
-                | {
-                    type?: T;
-                    newTab?: T;
-                    reference?: T;
-                    url?: T;
-                    label?: T;
-                    appearance?: T;
-                  };
-              id?: T;
-            };
-        media?: T;
-      };
   layout?:
     | T
     | {
@@ -1348,6 +1305,7 @@ export interface ArchiveBlockSelect<T extends boolean = true> {
  * via the `definition` "CarouselBlock_select".
  */
 export interface CarouselBlockSelect<T extends boolean = true> {
+  displayMode?: T;
   populateBy?: T;
   relationTo?: T;
   categories?: T;
@@ -1408,6 +1366,7 @@ export interface ArtworkSelect<T extends boolean = true> {
   iso?: T;
   availablePrints?: T;
   featured?: T;
+  darkBackground?: T;
   publishedAt?: T;
   generateSlug?: T;
   slug?: T;
@@ -1839,9 +1798,11 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  */
 export interface Header {
   id: string;
+  logo?: (string | null) | Media;
   navItems?:
     | {
-        link: {
+        type?: ('link' | 'dropdown') | null;
+        link?: {
           type?: ('reference' | 'custom') | null;
           newTab?: boolean | null;
           reference?: {
@@ -1851,6 +1812,24 @@ export interface Header {
           url?: string | null;
           label: string;
         };
+        showExplicitBadge?: boolean | null;
+        label?: string | null;
+        subItems?:
+          | {
+              link: {
+                type?: ('reference' | 'custom') | null;
+                newTab?: boolean | null;
+                reference?: {
+                  relationTo: 'pages';
+                  value: string | Page;
+                } | null;
+                url?: string | null;
+                label: string;
+              };
+              showExplicitBadge?: boolean | null;
+              id?: string | null;
+            }[]
+          | null;
         id?: string | null;
       }[]
     | null;
@@ -1886,9 +1865,11 @@ export interface Footer {
  * via the `definition` "header_select".
  */
 export interface HeaderSelect<T extends boolean = true> {
+  logo?: T;
   navItems?:
     | T
     | {
+        type?: T;
         link?:
           | T
           | {
@@ -1897,6 +1878,23 @@ export interface HeaderSelect<T extends boolean = true> {
               reference?: T;
               url?: T;
               label?: T;
+            };
+        showExplicitBadge?: T;
+        label?: T;
+        subItems?:
+          | T
+          | {
+              link?:
+                | T
+                | {
+                    type?: T;
+                    newTab?: T;
+                    reference?: T;
+                    url?: T;
+                    label?: T;
+                  };
+              showExplicitBadge?: T;
+              id?: T;
             };
         id?: T;
       };

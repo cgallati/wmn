@@ -1,41 +1,66 @@
 import type { Metadata } from 'next'
-import { Portfolio } from '@/components/Portfolio'
+import { RenderBlocks } from '@/blocks/RenderBlocks'
+import { generateMeta } from '@/utilities/generateMeta'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { draftMode } from 'next/headers'
+import { notFound } from 'next/navigation'
+import React from 'react'
 
-export const metadata: Metadata = {
-  title: 'Portfolio',
-  description: 'Photography Portfolio',
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await queryPageBySlug({
+    slug: 'home',
+  })
+
+  if (!page) {
+    return {
+      title: 'Home',
+      description: 'Photography Portfolio',
+    }
+  }
+
+  return generateMeta({ doc: page })
 }
 
 // Revalidate every hour to ensure fresh data
 export const revalidate = 3600
 
 export default async function HomePage() {
+  const page = await queryPageBySlug({
+    slug: 'home',
+  })
+
+  if (!page) {
+    return notFound()
+  }
+
+  const { layout } = page
+
+  return <RenderBlocks blocks={layout} />
+}
+
+const queryPageBySlug = async ({ slug }: { slug: string }) => {
   const { isEnabled: draft } = await draftMode()
+
   const payload = await getPayload({ config: configPromise })
 
   const result = await payload.find({
-    collection: 'artwork',
-    depth: 1,
-    draft: draft,
-    limit: 100,
+    collection: 'pages',
+    draft,
+    limit: 1,
     overrideAccess: draft,
-    sort: '-publishedAt',
+    pagination: false,
     where: {
-      _status: { equals: 'published' },
+      and: [
+        {
+          slug: {
+            equals: slug,
+          },
+        },
+        ...(draft ? [] : [{ _status: { equals: 'published' } }]),
+      ],
     },
   })
 
-  return (
-    <main className="min-h-screen">
-      <div className="py-8">
-        <div className="container">
-          <h1 className="text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">Portfolio</h1>
-        </div>
-      </div>
-      <Portfolio artwork={result.docs} />
-    </main>
-  )
+  return result.docs?.[0] || null
 }
