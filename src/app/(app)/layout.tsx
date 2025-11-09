@@ -58,18 +58,18 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           <AdminBar />
           <LivePreviewListener />
 
-          <div className="flex min-h-screen flex-col sm:flex-row">
-            {/* Desktop: vertical sidebar (>= 640px) */}
-            <div className="hidden sm:block">
+          <div className="flex min-h-screen flex-col lg:flex-row">
+            {/* Desktop: vertical sidebar (>= 1024px) */}
+            <div className="hidden lg:block">
               <Header vertical />
             </div>
 
-            {/* Mobile: horizontal header (< 640px) */}
-            <div className="block sm:hidden">
+            {/* Mobile: horizontal header (< 1024px) */}
+            <div className="block lg:hidden">
               <Header vertical={false} />
             </div>
 
-            <main className="flex-1 pt-16 sm:pt-0">{children}</main>
+            <main className="flex-1 pt-16 lg:pt-0">{children}</main>
           </div>
         </Providers>
       </body>

@@ -26,8 +26,8 @@ export function HeaderClient({ header, vertical = false }: Props) {
 
   if (vertical) {
     return (
-      <div className="relative z-20 w-64 border-r flex-shrink-0">
-        <nav className="flex flex-col h-full p-6 gap-8 sticky top-0">
+      <div className="relative z-20 w-64 border-r flex-shrink-0 min-h-screen">
+        <nav className="flex flex-col h-screen p-6 gap-8 sticky top-0">
           <Link className="flex items-center justify-center" href="/">
             {logo && typeof logo === 'object' ? (
               <MediaComponent resource={logo} imgClassName="w-32 h-auto object-contain" />

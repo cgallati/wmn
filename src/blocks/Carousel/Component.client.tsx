@@ -125,13 +125,13 @@ function FullscreenCarousel({ items }: { items: CarouselItem[] }) {
   }, [api])
 
   return (
-    <div className="relative w-full -mt-16 sm:-mt-0">
+    <div className="relative w-full -mt-16 lg:-mt-0 lg:h-screen">
       <Carousel
-        className="w-full h-full"
+        className="w-full h-full lg:h-screen"
         opts={{ align: 'center', loop: true }}
         setApi={setApi}
       >
-        <CarouselContent className="h-[calc(100vh-4rem)] sm:h-screen ml-0">
+        <CarouselContent className="h-[calc(100vh-4rem)] lg:h-screen ml-0">
           {items.map((item, index) => {
             const media = isProduct(item) ? (item.meta?.image as Media) : (item.image as Media)
 
@@ -141,14 +141,14 @@ function FullscreenCarousel({ items }: { items: CarouselItem[] }) {
               : false
 
             return (
-              <CarouselItem key={item.slug || index} className="relative h-full pl-0 basis-full">
+              <CarouselItem key={item.slug || index} className="relative h-full lg:h-screen pl-0 basis-full">
                 <div className="relative h-full w-full flex items-center justify-center bg-background">
                   {/* Image */}
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                     {typeof media === 'object' && media?.url && (
                       <MediaComponent
                         resource={media}
-                        imgClassName={isPortrait ? "h-full w-auto max-w-full object-contain" : "w-full h-auto max-h-full object-contain"}
+                        imgClassName={isPortrait ? "h-auto w-auto max-w-full max-h-full object-contain lg:h-screen lg:w-auto lg:max-w-none lg:max-h-none" : "w-auto h-auto max-w-full max-h-full object-contain lg:w-full lg:h-auto lg:max-w-none lg:max-h-none"}
                       />
                     )}
                   </div>
@@ -193,7 +193,7 @@ function FullscreenCarousel({ items }: { items: CarouselItem[] }) {
       {items[current] && (
         <>
           {/* Mobile: Below carousel */}
-          <div className="block sm:hidden px-4 py-2 text-left text-sm">
+          <div className="block lg:hidden px-4 py-2 text-left text-sm">
             <span className="italic">{items[current].title}</span>
             {isArtwork(items[current]) && (items[current] as Artwork).year && (
               <>, {(items[current] as Artwork).year}</>
@@ -201,7 +201,7 @@ function FullscreenCarousel({ items }: { items: CarouselItem[] }) {
           </div>
 
           {/* Desktop: Overlaid on carousel */}
-          <div className={`hidden sm:block absolute bottom-8 left-8 z-20 transition-colors ${
+          <div className={`hidden lg:block absolute bottom-8 left-8 z-20 transition-colors ${
             isDarkBackground ? 'text-white' : 'text-black'
           }`}>
             <span className="italic">{items[current].title}</span>

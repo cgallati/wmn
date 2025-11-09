@@ -20,7 +20,7 @@ export function Portfolio({ artwork }: PortfolioProps) {
 
   return (
     <div className="container py-8 md:py-12 lg:py-16">
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         {artwork.map((item) => {
           const image = typeof item.image === 'object' ? item.image : null
 

@@ -28,7 +28,7 @@ export function MobileMenu({ menu }: Props) {
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 640) {
+      if (window.innerWidth >= 1024) {
         setIsOpen(false)
       }
     }
@@ -56,8 +56,8 @@ export function MobileMenu({ menu }: Props) {
 
   return (
     <Sheet onOpenChange={setIsOpen} open={isOpen}>
-      <SheetTrigger className="relative flex h-11 w-11 items-center justify-center rounded-md border border-neutral-200 text-black transition-colors dark:border-neutral-700 dark:bg-black dark:text-white">
-        <MenuIcon className="h-4" />
+      <SheetTrigger className="relative flex h-11 w-11 items-center justify-center transition-colors">
+        <MenuIcon className="h-6 w-6 stroke-[1.5] stroke-black" />
       </SheetTrigger>
 
       <SheetContent side="right" className="px-4">
@@ -66,9 +66,9 @@ export function MobileMenu({ menu }: Props) {
           <SheetDescription>Navigation menu</SheetDescription>
         </SheetHeader>
 
-        <div className="py-8">
+        <div className="pt-16 pb-8">
           {menu?.length ? (
-            <ul className="flex w-full flex-col gap-4">
+            <ul className="flex w-full flex-col gap-6 text-base">
               {menu.map((item) => {
                 // Skip home links
                 if (item.link?.url === '/' || item.link?.url === '/home') {
