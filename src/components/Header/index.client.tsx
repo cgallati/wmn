@@ -22,6 +22,7 @@ export function HeaderClient({ header, vertical = false }: Props) {
   const menu = header.navItems || []
   const pathname = usePathname()
   const logo = header.logo as Media | null
+  const isShopEnabled = process.env.NEXT_PUBLIC_ENABLE_SHOP !== 'false'
 
   if (vertical) {
     return (
@@ -71,11 +72,13 @@ export function HeaderClient({ header, vertical = false }: Props) {
             </ul>
           ) : null}
 
-          <div className="pt-4 border-t">
-            <Suspense fallback={<OpenCartButton />}>
-              <Cart />
-            </Suspense>
-          </div>
+          {isShopEnabled && (
+            <div className="pt-4 border-t">
+              <Suspense fallback={<OpenCartButton />}>
+                <Cart />
+              </Suspense>
+            </div>
+          )}
         </nav>
       </div>
     )
@@ -131,11 +134,13 @@ export function HeaderClient({ header, vertical = false }: Props) {
             ) : null}
           </div>
 
-          <div className="flex justify-end md:w-1/3 gap-4">
-            <Suspense fallback={<OpenCartButton />}>
-              <Cart />
-            </Suspense>
-          </div>
+          {isShopEnabled && (
+            <div className="flex justify-end md:w-1/3 gap-4">
+              <Suspense fallback={<OpenCartButton />}>
+                <Cart />
+              </Suspense>
+            </div>
+          )}
         </div>
       </nav>
     </div>
