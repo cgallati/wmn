@@ -6,6 +6,7 @@ import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { Providers } from '@/providers'
 import { InitTheme } from '@/providers/Theme/InitTheme'
 import { GeistMono } from 'geist/font/mono'
+import { Analytics } from '@vercel/analytics/next'
 import React from 'react'
 import './globals.css'
 
@@ -72,6 +73,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             <main className="flex-1 pt-16 lg:pt-0">{children}</main>
           </div>
         </Providers>
+        <Analytics />
       </body>
     </html>
   )
