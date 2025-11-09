@@ -33,7 +33,7 @@ export function VariantSelector({ product }: { product: Product }) {
 
     return (
       <dl className="" key={type.id}>
-        <dt className="mb-4 text-sm">{type.label}</dt>
+        <dt className="mb-4 text-xs uppercase tracking-wider text-primary/50">{type.label}</dt>
         <dd className="flex flex-wrap gap-3">
           <React.Fragment>
             {options?.map((option) => {
@@ -98,8 +98,10 @@ export function VariantSelector({ product }: { product: Product }) {
                 <Button
                   variant={'ghost'}
                   aria-disabled={!isAvailableForSale}
-                  className={clsx('px-2', {
-                    'bg-primary/5 text-primary': isActive,
+                  className={clsx('px-4 py-2 uppercase text-xs tracking-wider border', {
+                    'border-primary bg-primary/5 text-primary': isActive,
+                    'border-primary/20 text-primary/50 hover:border-primary/40 hover:text-primary/80': !isActive && isAvailableForSale,
+                    'border-primary/10 text-primary/30': !isAvailableForSale,
                   })}
                   disabled={!isAvailableForSale}
                   key={option.id}

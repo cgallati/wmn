@@ -57,29 +57,25 @@ export const ProductGridItem: React.FC<Props> = ({ product, soldOut = false }) =
       <div className="relative">
         {image ? (
           <Media
-            className={clsx(
-              'relative aspect-square object-cover border rounded-2xl p-8 bg-primary-foreground',
-            )}
-            height={80}
-            imgClassName={clsx('h-full w-full object-cover rounded-2xl', {
-              'transition duration-300 ease-in-out group-hover:scale-102': !soldOut,
+            className="relative w-full"
+            imgClassName={clsx('w-full h-auto object-contain transition duration-300 ease-in-out', {
+              'group-hover:opacity-90': !soldOut,
               'grayscale': soldOut,
             })}
             resource={image}
-            width={80}
           />
         ) : null}
 
         {/* Sold Out Badge */}
         {soldOut && (
-          <div className="absolute top-4 right-4 bg-destructive text-destructive-foreground px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider">
+          <div className="absolute top-4 right-4 bg-red-600 text-white px-1.5 py-0.5 text-[0.5rem] font-bold uppercase tracking-wider leading-none">
             Sold Out
           </div>
         )}
 
         {/* Low Stock Badge */}
         {isLowStock && (
-          <div className="absolute top-4 right-4 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+          <div className="absolute top-4 right-4 bg-orange-600 text-white px-1.5 py-0.5 text-[0.5rem] font-bold uppercase tracking-wider leading-none">
             Only {availableStock} left
           </div>
         )}
@@ -87,7 +83,7 @@ export const ProductGridItem: React.FC<Props> = ({ product, soldOut = false }) =
 
       <div
         className={clsx(
-          'font-mono flex justify-between items-center mt-4',
+          'font-sans flex justify-between items-center mt-4 text-xs uppercase tracking-wider',
           soldOut
             ? 'text-primary/30'
             : 'text-primary/50 group-hover:text-primary/100',
@@ -96,7 +92,7 @@ export const ProductGridItem: React.FC<Props> = ({ product, soldOut = false }) =
         <div>{title}</div>
 
         {typeof price === 'number' && (
-          <div className="">
+          <div>
             <Price amount={price} />
           </div>
         )}

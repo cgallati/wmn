@@ -117,14 +117,14 @@ export default async function ProductPage({ params }: Args) {
         }}
         type="application/ld+json"
       />
-      <div className="container pt-8 pb-8">
-        <Button asChild variant="ghost" className="mb-4">
+      <div className="container pt-8 pb-16">
+        <Button asChild variant="ghost" className="mb-8 uppercase text-xs tracking-wider">
           <Link href="/shop">
             <ChevronLeftIcon />
-            All products
+            All Prints
           </Link>
         </Button>
-        <div className="flex flex-col gap-12 rounded-lg border p-8 md:py-12 lg:flex-row lg:gap-8 bg-primary-foreground">
+        <div className="flex flex-col gap-16 lg:flex-row lg:gap-12">
           <div className="h-full w-full basis-full lg:basis-1/2">
             <Suspense
               fallback={
@@ -158,9 +158,9 @@ function RelatedProducts({ products }: { products: Product[] }) {
   if (!products.length) return null
 
   return (
-    <div className="py-8">
-      <h2 className="mb-4 text-2xl font-bold">Related Products</h2>
-      <ul className="flex w-full gap-4 overflow-x-auto pt-1">
+    <div className="py-12">
+      <h2 className="mb-8 text-sm uppercase tracking-wider text-primary/50">Related Prints</h2>
+      <ul className="flex w-full gap-6 overflow-x-auto pt-1">
         {products.map((product) => (
           <li
             className="aspect-square w-full flex-none min-[475px]:w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/5"

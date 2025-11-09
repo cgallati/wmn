@@ -22,7 +22,7 @@ import { OpenCartButton } from './OpenCart'
 import { Button } from '@/components/ui/button'
 import { Product } from '@/payload-types'
 
-export function CartModal() {
+export function CartModal({ iconOnly = false }: { iconOnly?: boolean }) {
   const { cart } = useCart()
   const [isOpen, setIsOpen] = useState(false)
 
@@ -41,7 +41,7 @@ export function CartModal() {
   return (
     <Sheet onOpenChange={setIsOpen} open={isOpen}>
       <SheetTrigger asChild>
-        <OpenCartButton quantity={totalQuantity} />
+        <OpenCartButton quantity={totalQuantity} iconOnly={iconOnly} />
       </SheetTrigger>
 
       <SheetContent className="flex flex-col">

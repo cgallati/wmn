@@ -46,17 +46,30 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       <head>
         <InitTheme />
         <link rel="stylesheet" href="https://use.typekit.net/who5iig.css" />
-        <link href="/favicon.ico" rel="icon" sizes="32x32" />
-        <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
+        <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <meta name="apple-mobile-web-app-title" content="WMN Photo" />
+        <link rel="manifest" href="/site.webmanifest" />
       </head>
       <body>
         <Providers>
           <AdminBar />
           <LivePreviewListener />
 
-          <div className="flex min-h-screen">
-            <Header vertical />
-            <main className="flex-1">{children}</main>
+          <div className="flex min-h-screen flex-col sm:flex-row">
+            {/* Desktop: vertical sidebar (>= 640px) */}
+            <div className="hidden sm:block">
+              <Header vertical />
+            </div>
+
+            {/* Mobile: horizontal header (< 640px) */}
+            <div className="block sm:hidden">
+              <Header vertical={false} />
+            </div>
+
+            <main className="flex-1 pt-16 sm:pt-0">{children}</main>
           </div>
         </Providers>
       </body>

@@ -1,3 +1,41 @@
+/**
+ * Products Collection Configuration
+ *
+ * SETTING UP FRAMING VARIANTS:
+ * To add framing options (Framed/Unframed) to your prints, follow these steps in the Payload Admin:
+ *
+ * 1. Navigate to: Ecommerce → Variant Types
+ *    - Click "Create New"
+ *    - Name: "Framing"
+ *    - Save the variant type
+ *
+ * 2. Navigate to: Ecommerce → Variant Options
+ *    - Create first option:
+ *      • Name: "Framed"
+ *      • Variant Type: Select "Framing"
+ *      • Save
+ *    - Create second option:
+ *      • Name: "Unframed"
+ *      • Variant Type: Select "Framing"
+ *      • Save
+ *
+ * 3. Edit each Product:
+ *    - In "Product Details" tab:
+ *      • Check "Enable Variants"
+ *      • Under "Variant Types", select "Framing"
+ *      • Save the product
+ *
+ * 4. Configure pricing for each variant:
+ *    - Navigate to: Ecommerce → Variants
+ *    - Find the variants for your product (auto-generated after step 3)
+ *    - Edit each variant and set:
+ *      • Price in USD (e.g., Framed: $150, Unframed: $100)
+ *      • Save
+ *
+ * Note: Inventory is tracked at the product level (shared between framed/unframed).
+ * When a customer purchases either variant, it decrements the product's inventory count.
+ */
+
 import { CallToAction } from '@/blocks/CallToAction/config'
 import { Content } from '@/blocks/Content/config'
 import { MediaBlock } from '@/blocks/MediaBlock/config'

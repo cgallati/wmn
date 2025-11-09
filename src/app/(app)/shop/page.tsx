@@ -17,7 +17,6 @@ type Props = {
 }
 
 export default async function ShopPage({ searchParams }: Props) {
-  const { q: searchValue, sort, category } = await searchParams
   const payload = await getPayload({ config: configPromise })
 
   const products = await payload.find({
@@ -38,42 +37,11 @@ export default async function ShopPage({ searchParams }: Props) {
       updatedAt: true,
       createdAt: true,
     },
-    ...(sort ? { sort } : { sort: 'title' }),
+    sort: 'title',
     where: {
-      and: [
-        {
-          _status: {
-            equals: 'published',
-          },
-        },
-        ...(searchValue
-          ? [
-              {
-                or: [
-                  {
-                    title: {
-                      like: searchValue,
-                    },
-                  },
-                  {
-                    description: {
-                      like: searchValue,
-                    },
-                  },
-                ],
-              },
-            ]
-          : []),
-        ...(category
-          ? [
-              {
-                categories: {
-                  contains: category,
-                },
-              },
-            ]
-          : []),
-      ],
+      _status: {
+        equals: 'published',
+      },
     },
     populate: {
       variants: {
@@ -107,33 +75,18 @@ export default async function ShopPage({ searchParams }: Props) {
     return aIsSoldOut ? 1 : -1
   })
 
-  const resultsText = sortedProducts.length > 1 ? 'results' : 'result'
-
   return (
     <div>
-      {searchValue ? (
-        <p className="mb-4 text-sm text-muted-foreground">
-          {sortedProducts.length === 0
-            ? 'There are no products that match '
-            : `Showing ${sortedProducts.length} ${resultsText} for `}
-          <span className="font-bold">&quot;{searchValue}&quot;</span>
-        </p>
-      ) : null}
-
-      {!searchValue && sortedProducts.length === 0 && (
-        <p className="mb-4 text-sm text-muted-foreground">
-          No products found. Please try different filters.
-        </p>
-      )}
-
-      {sortedProducts.length > 0 ? (
-        <Grid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {sortedProducts.length === 0 ? (
+        <p className="text-sm uppercase tracking-wider text-primary/50">No prints available.</p>
+      ) : (
+        <Grid className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {sortedProducts.map((product) => {
             const soldOut = isSoldOut(product)
             return <ProductGridItem key={product.id} product={product} soldOut={soldOut} />
           })}
         </Grid>
-      ) : null}
+      )}
     </div>
   )
 }

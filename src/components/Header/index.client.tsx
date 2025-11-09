@@ -85,62 +85,27 @@ export function HeaderClient({ header, vertical = false }: Props) {
   }
 
   return (
-    <div className="relative z-20 border-b">
-      <nav className="flex items-center md:items-end justify-between container pt-2">
-        <div className="block flex-none md:hidden">
+    <div className="fixed top-0 left-0 right-0 z-20 bg-background border-b">
+      <nav className="flex items-center justify-between px-4 h-16">
+        {/* Logo - Left */}
+        <Link className="flex items-center" href="/">
+          {logo && typeof logo === 'object' ? (
+            <MediaComponent resource={logo} imgClassName="w-24 h-auto object-contain" />
+          ) : (
+            <LogoIcon className="w-24 h-auto" />
+          )}
+        </Link>
+
+        {/* Right side: Cart + Hamburger */}
+        <div className="flex items-center gap-3">
+          {isShopEnabled && (
+            <Suspense fallback={<OpenCartButton iconOnly />}>
+              <Cart iconOnly />
+            </Suspense>
+          )}
           <Suspense fallback={null}>
             <MobileMenu menu={menu} />
           </Suspense>
-        </div>
-        <div className="flex w-full items-end justify-between">
-          <div className="flex w-full items-end gap-6 md:w-1/3">
-            <Link className="flex w-full items-center justify-center pt-4 pb-4 md:w-auto" href="/">
-              {logo && typeof logo === 'object' ? (
-                <MediaComponent resource={logo} imgClassName="w-24 h-auto object-contain" />
-              ) : (
-                <LogoIcon className="w-24 h-auto" />
-              )}
-            </Link>
-            {menu.length ? (
-              <ul className="hidden gap-4 text-sm md:flex md:items-center">
-                {menu.map((item) => {
-                  // Skip rendering if this is a home link
-                  if (item.link?.url === '/' || item.link?.url === '/home') {
-                    return null
-                  }
-
-                  return (
-                    <li key={item.id} className="flex items-start gap-2">
-                      <CMSLink
-                        {...item.link}
-                        size={'clear'}
-                        className={cn('relative navLink', {
-                          active:
-                            item.link?.url && item.link.url !== '/'
-                              ? pathname.includes(item.link.url)
-                              : false,
-                        })}
-                        appearance="nav"
-                      />
-                      {item.showExplicitBadge && (
-                        <span className="inline-block bg-red-600 text-white text-[0.5rem] font-bold tracking-wider px-1.5 py-0.5 leading-none mt-2">
-                          EXPLICIT CONTENT
-                        </span>
-                      )}
-                    </li>
-                  )
-                })}
-              </ul>
-            ) : null}
-          </div>
-
-          {isShopEnabled && (
-            <div className="flex justify-end md:w-1/3 gap-4">
-              <Suspense fallback={<OpenCartButton />}>
-                <Cart />
-              </Suspense>
-            </div>
-          )}
         </div>
       </nav>
     </div>
@@ -154,7 +119,7 @@ function NavDropdown({ item, pathname }: { item: any; pathname: string }) {
     <li>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={cn('relative navLink block w-full text-left uppercase font-mono tracking-[0.1em] text-xs text-primary/50 hover:text-primary/100 p-0 pt-2 pb-6', {
+        className={cn('relative navLink block w-full text-left uppercase font-sans tracking-[0.1em] text-xs text-primary/50 hover:text-primary/100 p-0 pt-2 pb-6', {
           'text-primary/100': isOpen
         })}
       >

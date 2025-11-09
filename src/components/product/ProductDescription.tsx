@@ -52,10 +52,10 @@ export function ProductDescription({ product }: { product: Product }) {
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-        <h1 className="text-2xl font-medium">{product.title}</h1>
-        <div className="uppercase font-mono">
+    <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-4">
+        <h1 className="text-3xl uppercase tracking-tight">{product.title}</h1>
+        <div className="text-xl font-sans">
           {hasVariants ? (
             <Price highestAmount={highestAmount} lowestAmount={lowestAmount} />
           ) : (
@@ -63,20 +63,20 @@ export function ProductDescription({ product }: { product: Product }) {
           )}
         </div>
       </div>
+
       {product.description ? (
-        <RichText className="" data={product.description} enableGutter={false} />
+        <RichText className="prose-sm" data={product.description} enableGutter={false} />
       ) : null}
-      <hr />
+
       {hasVariants && (
-        <>
+        <div className="pt-4">
           <Suspense fallback={null}>
             <VariantSelector product={product} />
           </Suspense>
-
-          <hr />
-        </>
+        </div>
       )}
-      <div className="flex items-center justify-between">
+
+      <div className="flex items-center justify-between pt-4">
         <Suspense fallback={null}>
           <StockIndicator product={product} />
         </Suspense>

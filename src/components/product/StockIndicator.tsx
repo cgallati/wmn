@@ -54,19 +54,19 @@ export const StockIndicator: React.FC<Props> = ({ product }) => {
   return (
     <div className="flex items-center gap-2">
       {isOutOfStock && (
-        <Badge variant="destructive" className="uppercase font-mono text-xs">
+        <span className="inline-block bg-red-600 text-white px-1.5 py-0.5 text-[0.5rem] font-bold uppercase tracking-wider leading-none">
           Out of Stock
-        </Badge>
+        </span>
       )}
       {isLowStock && (
-        <Badge className="uppercase font-mono text-xs bg-orange-500 hover:bg-orange-600">
+        <span className="inline-block bg-orange-600 text-white px-1.5 py-0.5 text-[0.5rem] font-bold uppercase tracking-wider leading-none">
           Only {stockQuantity} Left
-        </Badge>
+        </span>
       )}
       {isInStock && (
-        <Badge variant="outline" className="uppercase font-mono text-xs text-green-600 border-green-600">
+        <span className="inline-block bg-green-600 text-white px-1.5 py-0.5 text-[0.5rem] font-bold uppercase tracking-wider leading-none">
           In Stock
-        </Badge>
+        </span>
       )}
     </div>
   )
