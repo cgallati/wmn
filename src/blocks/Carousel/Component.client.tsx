@@ -125,82 +125,69 @@ function FullscreenCarousel({ items }: { items: CarouselItem[] }) {
   }, [api])
 
   return (
-    <div className="relative w-full -mt-16 lg:-mt-0 lg:h-screen">
-      <Carousel
-        className="w-full h-full lg:h-screen"
-        opts={{ align: 'center', loop: true }}
-        setApi={setApi}
-      >
-        <CarouselContent className="h-[calc(100vh-4rem)] lg:h-screen ml-0">
-          {items.map((item, index) => {
-            const media = isProduct(item) ? (item.meta?.image as Media) : (item.image as Media)
+    <div className="relative w-full">
+      <div className="relative w-full h-[calc(100vh-120px)] lg:h-screen overflow-hidden">
+        <Carousel
+          className="w-full h-full"
+          opts={{ align: 'center', loop: true }}
+          setApi={setApi}
+        >
+          <CarouselContent className="h-full">
+            {items.map((item, index) => {
+              const media = isProduct(item) ? (item.meta?.image as Media) : (item.image as Media)
 
-            // Determine if image is portrait or landscape
-            const isPortrait = typeof media === 'object' && media?.width && media?.height
-              ? media.height > media.width
-              : false
-
-            return (
-              <CarouselItem key={item.slug || index} className="relative h-full lg:h-screen pl-0 basis-full">
-                <div className="relative h-full w-full flex items-center justify-center bg-background">
-                  {/* Image */}
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    {typeof media === 'object' && media?.url && (
+              return (
+                <CarouselItem key={item.slug || index} className="h-full basis-full">
+                  <div className="h-full w-full flex items-center justify-center bg-background">
+                    {/* Image */}
+                    {typeof media === 'object' && media?.url && media?.width && media?.height && (
                       <MediaComponent
                         resource={media}
-                        imgClassName={isPortrait ? "h-auto w-auto max-w-full max-h-full object-contain lg:h-screen lg:w-auto lg:max-w-none lg:max-h-none" : "w-auto h-auto max-w-full max-h-full object-contain lg:w-full lg:h-auto lg:max-w-none lg:max-h-none"}
+                        width={media.width}
+                        height={media.height}
+                        priority={index < 3}
+                        imgClassName="!max-w-full !max-h-[calc(100vh-120px)] lg:!max-h-screen !w-auto !h-auto object-contain"
                       />
                     )}
                   </div>
-                </div>
-              </CarouselItem>
-            )
-          })}
-        </CarouselContent>
-      </Carousel>
+                </CarouselItem>
+              )
+            })}
+          </CarouselContent>
+        </Carousel>
 
-      {/* Click zones for navigation - persistent across all images */}
-      <button
-        onClick={scrollPrev}
-        className="group/prev absolute left-0 top-0 h-full w-1/2 z-10 cursor-pointer"
-        aria-label="Previous image"
-      >
-        {/* Chevron indicator */}
-        <span className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors text-6xl font-thin pointer-events-none ${
-          isDarkBackground
-            ? 'text-white/40 group-hover/prev:text-white/70'
-            : 'text-black/40 group-hover/prev:text-black/70'
-        }`}>
-          ‹
-        </span>
-      </button>
-      <button
-        onClick={scrollNext}
-        className="group/next absolute right-0 top-0 h-full w-1/2 z-10 cursor-pointer"
-        aria-label="Next image"
-      >
-        {/* Chevron indicator */}
-        <span className={`absolute right-4 top-1/2 -translate-y-1/2 transition-colors text-6xl font-thin pointer-events-none ${
-          isDarkBackground
-            ? 'text-white/40 group-hover/next:text-white/70'
-            : 'text-black/40 group-hover/next:text-black/70'
-        }`}>
-          ›
-        </span>
-      </button>
+        {/* Click zones for navigation - persistent across all images */}
+        <button
+          onClick={scrollPrev}
+          className="group/prev absolute left-0 top-0 h-full w-1/2 z-10 cursor-pointer"
+          aria-label="Previous image"
+        >
+          {/* Chevron indicator */}
+          <span className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors text-6xl font-thin pointer-events-none ${
+            isDarkBackground
+              ? 'text-white/40 group-hover/prev:text-white/70'
+              : 'text-black/40 group-hover/prev:text-black/70'
+          }`}>
+            ‹
+          </span>
+        </button>
+        <button
+          onClick={scrollNext}
+          className="group/next absolute right-0 top-0 h-full w-1/2 z-10 cursor-pointer"
+          aria-label="Next image"
+        >
+          {/* Chevron indicator */}
+          <span className={`absolute right-4 top-1/2 -translate-y-1/2 transition-colors text-6xl font-thin pointer-events-none ${
+            isDarkBackground
+              ? 'text-white/40 group-hover/next:text-white/70'
+              : 'text-black/40 group-hover/next:text-black/70'
+          }`}>
+            ›
+          </span>
+        </button>
 
-      {/* Artwork title and year - Below carousel on mobile, overlaid on desktop */}
-      {items[current] && (
-        <>
-          {/* Mobile: Below carousel */}
-          <div className="block lg:hidden px-4 py-2 text-left text-sm">
-            <span className="italic">{items[current].title}</span>
-            {isArtwork(items[current]) && (items[current] as Artwork).year && (
-              <>, {(items[current] as Artwork).year}</>
-            )}
-          </div>
-
-          {/* Desktop: Overlaid on carousel */}
+        {/* Desktop: Overlaid on carousel */}
+        {items[current] && (
           <div className={`hidden lg:block absolute bottom-8 left-8 z-20 transition-colors ${
             isDarkBackground ? 'text-white' : 'text-black'
           }`}>
@@ -209,7 +196,17 @@ function FullscreenCarousel({ items }: { items: CarouselItem[] }) {
               <>, {(items[current] as Artwork).year}</>
             )}
           </div>
-        </>
+        )}
+      </div>
+
+      {/* Mobile: Below carousel */}
+      {items[current] && (
+        <div className="block lg:hidden px-4 py-2 text-left text-sm bg-background">
+          <span className="italic">{items[current].title}</span>
+          {isArtwork(items[current]) && (items[current] as Artwork).year && (
+            <>, {(items[current] as Artwork).year}</>
+          )}
+        </div>
       )}
     </div>
   )
