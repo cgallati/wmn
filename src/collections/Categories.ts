@@ -1,5 +1,6 @@
 import { slugField } from 'payload'
 import type { CollectionConfig } from 'payload'
+import { revalidateCategory, revalidateDelete } from './Categories/hooks/revalidateCategory'
 
 export const Categories: CollectionConfig = {
   slug: 'categories',
@@ -20,4 +21,8 @@ export const Categories: CollectionConfig = {
       position: undefined,
     }),
   ],
+  hooks: {
+    afterChange: [revalidateCategory],
+    afterDelete: [revalidateDelete],
+  },
 }

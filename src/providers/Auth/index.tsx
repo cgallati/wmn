@@ -131,11 +131,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setUser(meUser || null)
           setStatus(meUser ? 'loggedIn' : undefined)
         } else {
-          throw new Error('An error occurred while fetching your account.')
+          // Not logged in - this is a valid state, not an error
+          setUser(null)
+          setStatus('loggedOut')
         }
       } catch (e) {
+        // Network error or other fetch failure
+        // Silently set user to null - being logged out is valid
         setUser(null)
-        throw new Error('An error occurred while fetching your account.')
+        setStatus('loggedOut')
       }
     }
 

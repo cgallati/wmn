@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 import { adminOnly } from '@/access/adminOnly'
 import { adminOrPublishedStatus } from '@/access/adminOrPublishedStatus'
 import { slugField } from 'payload'
+import { revalidateArtwork, revalidateDelete } from './Artwork/hooks/revalidateArtwork'
 
 export const Artwork: CollectionConfig = {
   slug: 'artwork',
@@ -192,6 +193,8 @@ export const Artwork: CollectionConfig = {
         return data
       },
     ],
+    afterChange: [revalidateArtwork],
+    afterDelete: [revalidateDelete],
   },
   versions: {
     drafts: {
