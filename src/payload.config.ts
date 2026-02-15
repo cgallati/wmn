@@ -86,7 +86,7 @@ export default buildConfig({
   plugins: [
     ...plugins,
     vercelBlobStorage({
-      enabled: true, // Enable on all environments
+      enabled: process.env.VERCEL_ENV !== undefined, // Only enable on Vercel (production)
       collections: {
         media: true, // Enable for Media collection
       },
