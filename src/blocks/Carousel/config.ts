@@ -78,8 +78,9 @@ export const Carousel: Block = {
       type: 'relationship',
       admin: {
         condition: (_, siblingData) => siblingData.populateBy === 'selection',
-        appearance: 'drawer',
-        isSortable: true,
+        components: {
+          Field: '@/components/ArtworkPicker#ArtworkPicker',
+        },
       },
       hasMany: true,
       label: 'Selection',
