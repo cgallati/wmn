@@ -14,7 +14,7 @@ export const Artwork: CollectionConfig = {
   },
   admin: {
     group: 'Content',
-    defaultColumns: ['title', 'year', 'featured', '_status', 'updatedAt'],
+    defaultColumns: ['image', 'title', 'year', 'featured', '_status'],
     useAsTitle: 'title',
   },
   fields: [

@@ -37,5 +37,6 @@ export const Media: CollectionConfig = {
   ],
   upload: {
     staticDir: path.resolve(dirname, '../../public/media'),
+    adminThumbnail: ({ doc }) => doc.url as string,
   },
 }

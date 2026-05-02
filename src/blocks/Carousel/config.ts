@@ -78,6 +78,8 @@ export const Carousel: Block = {
       type: 'relationship',
       admin: {
         condition: (_, siblingData) => siblingData.populateBy === 'selection',
+        appearance: 'drawer',
+        isSortable: true,
       },
       hasMany: true,
       label: 'Selection',
