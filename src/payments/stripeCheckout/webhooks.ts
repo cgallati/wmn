@@ -121,9 +121,16 @@ const settle = async (req: PayloadRequest, session: Stripe.Checkout.Session) => 
   })
 
   const serverURL = process.env.NEXT_PUBLIC_SERVER_URL || payload.config.serverURL
+  // On a protected Vercel deployment (Previews), a request to our own URL needs the
+  // automation bypass secret. Vercel sets this variable when Protection Bypass for
+  // Automation is enabled; it is absent locally and in unprotected production.
+  const bypass = process.env.VERCEL_AUTOMATION_BYPASS_SECRET
   const response = await fetch(`${serverURL}/api/payments/stripe/confirm-order`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...(bypass ? { 'x-vercel-protection-bypass': bypass } : {}),
+    },
     body: JSON.stringify({
       cartID,
       secret: (cart as { secret?: string }).secret,
