@@ -1,21 +1,13 @@
 import type { Metadata } from 'next'
 
+import { ConfirmOrder } from '@/components/checkout/ConfirmOrder'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import React, { Suspense } from 'react'
-import { ConfirmOrder } from '@/components/checkout/ConfirmOrder'
-import { LoadingSpinner } from '@/components/LoadingSpinner'
 
-export default async function ConfirmOrderPage() {
+export default function ConfirmOrderPage() {
   return (
-    <div className="container min-h-[90vh] flex py-12">
-      <Suspense
-        fallback={
-          <div className="text-center w-full flex flex-col items-center justify-start gap-4">
-            <h1 className="text-2xl">Loading...</h1>
-            <LoadingSpinner className="w-12 h-6" />
-          </div>
-        }
-      >
+    <div className="container min-h-[90vh]">
+      <Suspense fallback={null}>
         <ConfirmOrder />
       </Suspense>
     </div>
@@ -23,10 +15,8 @@ export default async function ConfirmOrderPage() {
 }
 
 export const metadata: Metadata = {
-  description: 'Confirm order.',
-  openGraph: mergeOpenGraph({
-    title: 'Confirming order',
-    url: '/checkout/confirm-order',
-  }),
+  description: 'Confirming your order.',
+  openGraph: mergeOpenGraph({ title: 'Confirming order', url: '/checkout/confirm-order' }),
+  robots: { index: false },
   title: 'Confirming order',
 }

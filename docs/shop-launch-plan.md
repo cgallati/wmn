@@ -141,6 +141,21 @@ The current adapter is PaymentIntents + Payment Element. Three pieces are **miss
 
 **Decided: A** (2026-11-15). Spike it first to confirm that the plugin's adapter contract (`initiatePayment` / `confirmOrder`, and how the transaction is reconciled by webhook) maps cleanly onto a Checkout Session instead of a PaymentIntent.
 
+**Built 2026-11-15** (option A, on the shop branch):
+
+- `src/payments/stripeCheckout/` is a custom payment adapter named `stripe`, so it replaces the stock PaymentIntents adapter without forking the plugin, and the endpoints stay at `/api/payments/stripe/{initiate,confirm-order,webhooks}`.
+  - `initiatePayment` creates a Checkout Session (`ui_mode: 'elements'`) with `automatic_tax`, US shipping address collection and one **placeholder** flat shipping rate. It also records a pending Transaction.
+  - `confirmOrder` checks that the session is paid and matches the transaction, then calls the plugin's `finalizeOrder`, which does the atomic claim, inventory decrement and order creation.
+- **Webhook:** it verifies the signature and settles paid sessions through the plugin's own `/confirm-order` (one settlement path, race-safe). It also marks failed or expired sessions. Subscribe the endpoint to `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed` and `checkout.session.expired`. A paid session from a signed-in customer is logged, not settled, because checkout is guest-only.
+- **Checkout page:** email first, then the Shipping Address Element, the shipping option, the Payment Element and Pay. A live summary shows subtotal, shipping, tax and total. The confirmation page confirms, clears the cart and opens the order page.
+- **Packages:** `stripe` 23.1 (API `2026-10-28.endive`), `@stripe/stripe-js` 10.3, `@stripe/react-stripe-js` 7.1.
+- **Still open before launch:**
+  - Real shipping rates and regions (`SHIPPING_OPTIONS` and `ALLOWED_SHIPPING_COUNTRIES` in `shared.ts`).
+  - A Georgia registration in Stripe Tax; until then tax is $0.
+  - A registered webhook endpoint and its signing secret.
+  - An email adapter for receipts and find-order.
+  - Whether to keep Link and the BNPL methods shown by the Payment Element (a Dashboard setting).
+
 Other checkout pieces:
 
 - **Shipping:** US-only at launch, with flat rates by package type (flat mailer vs. tube vs. framed crate). International later.

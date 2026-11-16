@@ -1,441 +1,300 @@
 'use client'
 
-import { Media } from '@/components/Media'
-import { Message } from '@/components/Message'
-import { Price } from '@/components/Price'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { useAuth } from '@/providers/Auth'
-import { useTheme } from '@/providers/Theme'
-import { Elements } from '@stripe/react-stripe-js'
+import type { CartItem } from '@/components/Cart'
+
+import { useCart, usePayments } from '@payloadcms/plugin-ecommerce/client/react'
+import {
+  CheckoutElementsProvider,
+  PaymentElement,
+  ShippingAddressElement,
+  useCheckoutElements,
+} from '@stripe/react-stripe-js/checkout'
 import { loadStripe } from '@stripe/stripe-js'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import React, { Suspense, useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useId, useMemo, useState } from 'react'
 
-import { cssVariables } from '@/cssVariables'
-import { CheckoutForm } from '@/components/forms/CheckoutForm'
-import { useAddresses, useCart, usePayments } from '@payloadcms/plugin-ecommerce/client/react'
-import { CheckoutAddresses } from '@/components/checkout/CheckoutAddresses'
-import { CreateAddressModal } from '@/components/addresses/CreateAddressModal'
-import { Address } from '@/payload-types'
-import type { CartItem } from '@/components/Cart'
-import { Checkbox } from '@/components/ui/checkbox'
-import { AddressItem } from '@/components/addresses/AddressItem'
-import { FormItem } from '@/components/forms/FormItem'
-import { toast } from 'sonner'
-import { LoadingSpinner } from '@/components/LoadingSpinner'
+import { OrderSummary, type SessionTotals } from './OrderSummary'
+import { stripeAppearance, stripeFonts } from './stripeAppearance'
+import { CHECKOUT_EMAIL_KEY } from './storage'
 
-const apiKey = `${process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}`
-const stripe = loadStripe(apiKey)
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '')
 
-export const CheckoutPage: React.FC = () => {
-  const { user } = useAuth()
-  const router = useRouter()
+const label = 'text-xs font-medium uppercase tracking-[0.1em] text-[#525252]'
+const quietAction =
+  'text-xs font-medium uppercase tracking-[0.1em] text-primary/50 outline-none hover:text-primary focus-visible:text-primary focus-visible:underline focus-visible:underline-offset-4'
+const filledButton =
+  'w-full bg-foreground px-8 py-4 text-xs font-medium uppercase tracking-[0.1em] text-background outline-none transition-opacity hover:opacity-85 focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-4 disabled:cursor-not-allowed disabled:opacity-40'
+
+/**
+ * Guest checkout on a Stripe Checkout Session (ui_mode: elements). Email first, because the
+ * session and its pending Transaction are created for that email; then shipping address,
+ * shipping, payment. Stripe recalculates tax and shipping as the address changes.
+ */
+export function CheckoutPage() {
   const { cart } = useCart()
-  const [error, setError] = useState<null | string>(null)
-  const { theme } = useTheme()
-  /**
-   * State to manage the email input for guest checkout.
-   */
-  const [email, setEmail] = useState('')
-  const [emailEditable, setEmailEditable] = useState(true)
-  const [paymentData, setPaymentData] = useState<null | Record<string, unknown>>(null)
   const { initiatePayment } = usePayments()
-  const { addresses } = useAddresses()
-  const [shippingAddress, setShippingAddress] = useState<Partial<Address>>()
-  const [billingAddress, setBillingAddress] = useState<Partial<Address>>()
-  const [billingAddressSameAsShipping, setBillingAddressSameAsShipping] = useState(true)
-  const [isProcessingPayment, setProcessingPayment] = useState(false)
+  const emailId = useId()
 
-  const cartIsEmpty = !cart || !cart.items || !cart.items.length
+  const [email, setEmail] = useState('')
+  const [clientSecret, setClientSecret] = useState<string>()
+  const [starting, setStarting] = useState(false)
+  const [error, setError] = useState<string>()
+  const [cartChanged, setCartChanged] = useState(false)
 
-  const canGoToPayment = Boolean(
-    (email || user) && billingAddress && (billingAddressSameAsShipping || shippingAddress),
-  )
-
-  // On initial load wait for addresses to be loaded and check to see if we can prefill a default one
-  useEffect(() => {
-    if (!shippingAddress) {
-      if (addresses && addresses.length > 0) {
-        const defaultAddress = addresses[0]
-        if (defaultAddress) {
-          setBillingAddress(defaultAddress)
-        }
-      }
-    }
-  }, [addresses])
+  const items = useMemo(() => (cart?.items ?? []) as CartItem[], [cart?.items])
+  // A session is priced for the cart it was created from; any cart edit invalidates it.
+  const cartKey = items.map((i) => `${i.id}:${i.quantity}`).join('|')
+  const [sessionCartKey, setSessionCartKey] = useState<string>()
 
   useEffect(() => {
-    return () => {
-      setShippingAddress(undefined)
-      setBillingAddress(undefined)
-      setBillingAddressSameAsShipping(true)
-      setEmail('')
-      setEmailEditable(true)
+    if (clientSecret && sessionCartKey !== undefined && cartKey !== sessionCartKey) {
+      setClientSecret(undefined)
+      setCartChanged(true)
     }
-  }, [])
+  }, [cartKey, clientSecret, sessionCartKey])
 
-  const initiatePaymentIntent = useCallback(
-    async (paymentID: string) => {
-      try {
-        const paymentData = (await initiatePayment(paymentID, {
-          additionalData: {
-            ...(email ? { customerEmail: email } : {}),
-            billingAddress,
-            shippingAddress: billingAddressSameAsShipping ? billingAddress : shippingAddress,
-          },
-        })) as Record<string, unknown>
-
-        if (paymentData) {
-          setPaymentData(paymentData)
-        }
-      } catch (error) {
-        const errorData = error instanceof Error ? JSON.parse(error.message) : {}
-        let errorMessage = 'An error occurred while initiating payment.'
-
-        if (errorData?.cause?.code === 'OutOfStock') {
-          errorMessage = 'One or more items in your cart are out of stock.'
-        }
-
-        setError(errorMessage)
-        toast.error(errorMessage)
-      }
-    },
-    [billingAddress, billingAddressSameAsShipping, shippingAddress],
-  )
-
-  if (!stripe) return null
-
-  if (cartIsEmpty && isProcessingPayment) {
+  if (!items.length) {
     return (
-      <div className="py-12 w-full items-center justify-center">
-        <div className="prose dark:prose-invert text-center max-w-none self-center mb-8">
-          <p>Processing your payment...</p>
-        </div>
-        <LoadingSpinner />
+      <div className="flex flex-col items-start gap-6 py-16">
+        <h1 className="text-3xl font-bold tracking-tight">Checkout</h1>
+        <p className="text-[#404040]">Your cart is empty.</p>
+        <Link className={quietAction} href="/shop">
+          Back to prints
+        </Link>
       </div>
     )
   }
 
-  if (cartIsEmpty) {
+  const start = async (event: React.FormEvent) => {
+    event.preventDefault()
+    setError(undefined)
+    setCartChanged(false)
+    setStarting(true)
+    try {
+      const result = (await initiatePayment('stripe', {
+        additionalData: { customerEmail: email.trim() },
+      })) as { clientSecret?: string }
+      if (!result?.clientSecret) throw new Error('missing client secret')
+      try {
+        // The return page needs the email to confirm a guest order. Kept out of the URL.
+        window.sessionStorage.setItem(CHECKOUT_EMAIL_KEY, email.trim())
+      } catch {
+        // Without storage, the webhook still settles the order.
+      }
+      setSessionCartKey(cartKey)
+      setClientSecret(result.clientSecret)
+    } catch (err) {
+      setError(describeInitiateError(err))
+    } finally {
+      setStarting(false)
+    }
+  }
+
+  if (clientSecret) {
     return (
-      <div className="prose dark:prose-invert py-12 w-full items-center">
-        <p>Your cart is empty.</p>
-        <Link href="/search">Continue shopping?</Link>
-      </div>
+      <CheckoutElementsProvider
+        key={clientSecret}
+        options={{
+          clientSecret,
+          elementsOptions: { appearance: stripeAppearance, fonts: stripeFonts },
+        }}
+        stripe={stripePromise}
+      >
+        <PaymentSteps
+          email={email}
+          emailLabelId={`${emailId}-label`}
+          items={items}
+          onChangeEmail={() => setClientSecret(undefined)}
+        />
+      </CheckoutElementsProvider>
     )
   }
 
   return (
-    <div className="flex flex-col items-stretch justify-stretch my-8 md:flex-row grow gap-10 md:gap-6 lg:gap-8">
-      <div className="basis-full lg:basis-2/3 flex flex-col gap-8 justify-stretch">
-        <h2 className="font-medium text-3xl">Contact</h2>
-        {!user && (
-          <div className=" bg-accent dark:bg-black rounded-lg p-4 w-full flex items-center">
-            <div className="prose dark:prose-invert">
-              <Button asChild className="no-underline text-inherit" variant="outline">
-                <Link href="/login">Log in</Link>
-              </Button>
-              <p className="mt-0">
-                <span className="mx-2">or</span>
-                <Link href="/create-account">create an account</Link>
-              </p>
-            </div>
-          </div>
-        )}
-        {user ? (
-          <div className="bg-accent dark:bg-card rounded-lg p-4 ">
-            <div>
-              <p>{user.email}</p>{' '}
-              <p>
-                Not you?{' '}
-                <Link className="underline" href="/logout">
-                  Log out
-                </Link>
-              </p>
-            </div>
-          </div>
-        ) : (
-          <div className="bg-accent dark:bg-black rounded-lg p-4 ">
-            <div>
-              <p className="mb-4">Enter your email to checkout as a guest.</p>
-
-              <FormItem className="mb-6">
-                <Label htmlFor="email">Email Address</Label>
-                <Input
-                  disabled={!emailEditable}
-                  id="email"
-                  name="email"
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  type="email"
-                />
-              </FormItem>
-
-              <Button
-                disabled={!email || !emailEditable}
-                onClick={(e) => {
-                  e.preventDefault()
-                  setEmailEditable(false)
-                }}
-                variant="default"
-              >
-                Continue as guest
-              </Button>
-            </div>
-          </div>
-        )}
-
-        <h2 className="font-medium text-3xl">Address</h2>
-
-        {billingAddress ? (
-          <div>
-            <AddressItem
-              actions={
-                <Button
-                  variant={'outline'}
-                  disabled={Boolean(paymentData)}
-                  onClick={(e) => {
-                    e.preventDefault()
-                    setBillingAddress(undefined)
-                  }}
-                >
-                  Remove
-                </Button>
-              }
-              address={billingAddress}
-            />
-          </div>
-        ) : user ? (
-          <CheckoutAddresses heading="Billing address" setAddress={setBillingAddress} />
-        ) : (
-          <CreateAddressModal
-            disabled={!email || Boolean(emailEditable)}
-            callback={(address) => {
-              setBillingAddress(address)
-            }}
-            skipSubmission={true}
+    <Shell summary={<OrderSummary items={items} totals={undefined} />}>
+      <form className="flex flex-col gap-6" onSubmit={start}>
+        <div className="flex flex-col gap-3">
+          <label className={label} htmlFor={emailId}>
+            Email
+          </label>
+          <input
+            autoComplete="email"
+            className="border border-[hsl(240_6%_90%)] bg-background px-3 py-3 text-base outline-none focus:border-foreground"
+            id={emailId}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            type="email"
+            value={email}
           />
-        )}
-
-        <div className="flex gap-4 items-center">
-          <Checkbox
-            id="shippingTheSameAsBilling"
-            checked={billingAddressSameAsShipping}
-            disabled={Boolean(paymentData || (!user && (!email || Boolean(emailEditable))))}
-            onCheckedChange={(state) => {
-              setBillingAddressSameAsShipping(state as boolean)
-            }}
-          />
-          <Label htmlFor="shippingTheSameAsBilling">Shipping is the same as billing</Label>
+          <p className="text-sm text-[#404040]">Used for your receipt and to look up your order.</p>
         </div>
-
-        {!billingAddressSameAsShipping && (
-          <>
-            {shippingAddress ? (
-              <div>
-                <AddressItem
-                  actions={
-                    <Button
-                      variant={'outline'}
-                      disabled={Boolean(paymentData)}
-                      onClick={(e) => {
-                        e.preventDefault()
-                        setShippingAddress(undefined)
-                      }}
-                    >
-                      Remove
-                    </Button>
-                  }
-                  address={shippingAddress}
-                />
-              </div>
-            ) : user ? (
-              <CheckoutAddresses
-                heading="Shipping address"
-                description="Please select a shipping address."
-                setAddress={setShippingAddress}
-              />
-            ) : (
-              <CreateAddressModal
-                callback={(address) => {
-                  setShippingAddress(address)
-                }}
-                disabled={!email || Boolean(emailEditable)}
-                skipSubmission={true}
-              />
-            )}
-          </>
+        {cartChanged && (
+          <p className="text-sm" role="status">
+            Your cart changed. Continue again to update the total.
+          </p>
         )}
-
-        {!paymentData && (
-          <Button
-            className="self-start"
-            disabled={!canGoToPayment}
-            onClick={(e) => {
-              e.preventDefault()
-              void initiatePaymentIntent('stripe')
-            }}
-          >
-            Go to payment
-          </Button>
+        {error && (
+          <p className="text-sm" role="alert">
+            {error}
+          </p>
         )}
+        <button className={filledButton} disabled={starting} type="submit">
+          {starting ? 'One moment' : 'Continue to shipping'}
+        </button>
+      </form>
+    </Shell>
+  )
+}
 
-        {!paymentData?.['clientSecret'] && error && (
-          <div className="my-8">
-            <Message error={error} />
-
-            <Button
-              onClick={(e) => {
-                e.preventDefault()
-                router.refresh()
-              }}
-              variant="default"
-            >
-              Try again
-            </Button>
-          </div>
-        )}
-
-        <Suspense fallback={<React.Fragment />}>
-          {/* @ts-ignore */}
-          {paymentData && paymentData?.['clientSecret'] && (
-            <div className="pb-16">
-              <h2 className="font-medium text-3xl">Payment</h2>
-              {error && <p>{`Error: ${error}`}</p>}
-              <Elements
-                options={{
-                  appearance: {
-                    theme: 'stripe',
-                    variables: {
-                      borderRadius: '6px',
-                      colorPrimary: '#858585',
-                      gridColumnSpacing: '20px',
-                      gridRowSpacing: '20px',
-                      colorBackground: theme === 'dark' ? '#0a0a0a' : cssVariables.colors.base0,
-                      colorDanger: cssVariables.colors.error500,
-                      colorDangerText: cssVariables.colors.error500,
-                      colorIcon:
-                        theme === 'dark' ? cssVariables.colors.base0 : cssVariables.colors.base1000,
-                      colorText: theme === 'dark' ? '#858585' : cssVariables.colors.base1000,
-                      colorTextPlaceholder: '#858585',
-                      fontFamily: 'Geist, sans-serif',
-                      fontSizeBase: '16px',
-                      fontWeightBold: '600',
-                      fontWeightNormal: '500',
-                      spacingUnit: '4px',
-                    },
-                  },
-                  clientSecret: paymentData['clientSecret'] as string,
-                }}
-                stripe={stripe}
-              >
-                <div className="flex flex-col gap-8">
-                  <CheckoutForm
-                    customerEmail={email}
-                    billingAddress={billingAddress}
-                    setProcessingPayment={setProcessingPayment}
-                  />
-                  <Button
-                    variant="ghost"
-                    className="self-start"
-                    onClick={() => setPaymentData(null)}
-                  >
-                    Cancel payment
-                  </Button>
-                </div>
-              </Elements>
-            </div>
-          )}
-        </Suspense>
+/** Two columns from 1024px: the form, and the order summary (first on small screens). */
+function Shell({ children, summary }: { children: React.ReactNode; summary: React.ReactNode }) {
+  return (
+    <div className="grid grid-cols-1 gap-12 py-12 lg:grid-cols-[minmax(0,32rem)_minmax(0,1fr)] lg:gap-24">
+      <div className="flex flex-col gap-12">
+        <h1 className="text-3xl font-bold tracking-tight md:text-4xl">Checkout</h1>
+        {children}
       </div>
-
-      {!cartIsEmpty && (
-        <div className="basis-full lg:basis-1/3 lg:pl-8 p-8 border-none bg-primary/5 flex flex-col gap-8 rounded-lg">
-          <h2 className="text-3xl font-medium">Your cart</h2>
-          {cart?.items?.map((item: CartItem, index) => {
-            if (typeof item.product === 'object' && item.product) {
-              const {
-                product,
-                product: { id, meta, title, gallery },
-                quantity,
-                variant,
-              } = item
-
-              if (!quantity) return null
-
-              let image = gallery?.[0]?.image || meta?.image
-              let price = product?.priceInUSD
-
-              const isVariant = Boolean(variant) && typeof variant === 'object'
-
-              if (isVariant) {
-                price = variant?.priceInUSD
-
-                const imageVariant = product.gallery?.find((item) => {
-                  if (!item.variantOption) return false
-                  const variantOptionID =
-                    typeof item.variantOption === 'object'
-                      ? item.variantOption.id
-                      : item.variantOption
-
-                  const hasMatch = variant?.options?.some((option) => {
-                    if (typeof option === 'object') return option.id === variantOptionID
-                    else return option === variantOptionID
-                  })
-
-                  return hasMatch
-                })
-
-                if (imageVariant && typeof imageVariant.image !== 'string') {
-                  image = imageVariant.image
-                }
-              }
-
-              return (
-                <div className="flex items-start gap-4" key={index}>
-                  <div className="flex items-stretch justify-stretch h-20 w-20 p-2 rounded-lg border">
-                    <div className="relative w-full h-full">
-                      {image && typeof image !== 'string' && (
-                        <Media className="" fill imgClassName="rounded-lg" resource={image} />
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex grow justify-between items-center">
-                    <div className="flex flex-col gap-1">
-                      <p className="font-medium text-lg">{title}</p>
-                      {variant && typeof variant === 'object' && (
-                        <p className="text-sm font-mono text-primary/50 tracking-[0.1em]">
-                          {variant.options
-                            ?.map((option) => {
-                              if (typeof option === 'object') return option.label
-                              return null
-                            })
-                            .join(', ')}
-                        </p>
-                      )}
-                      <div>
-                        {'x'}
-                        {quantity}
-                      </div>
-                    </div>
-
-                    {typeof price === 'number' && <Price amount={price} />}
-                  </div>
-                </div>
-              )
-            }
-            return null
-          })}
-          <hr />
-          <div className="flex justify-between items-center gap-2">
-            <span className="uppercase">Total</span>{' '}
-            <Price className="text-3xl font-medium" amount={cart.subtotal || 0} />
-          </div>
-        </div>
-      )}
+      <div className="order-first lg:order-none lg:sticky lg:top-12 lg:self-start">{summary}</div>
     </div>
   )
+}
+
+/** Everything that needs the live Checkout Session. Rendered inside CheckoutElementsProvider. */
+function PaymentSteps({
+  email,
+  emailLabelId,
+  items,
+  onChangeEmail,
+}: {
+  email: string
+  emailLabelId: string
+  items: CartItem[]
+  onChangeEmail: () => void
+}) {
+  const state = useCheckoutElements()
+  const [paying, setPaying] = useState(false)
+  const [error, setError] = useState<string>()
+
+  if (state.type === 'loading') {
+    return (
+      <Shell summary={<OrderSummary items={items} totals={undefined} />}>
+        <p className={label} role="status">
+          Loading payment
+        </p>
+      </Shell>
+    )
+  }
+  if (state.type === 'error') {
+    return (
+      <Shell summary={<OrderSummary items={items} totals={undefined} />}>
+        <p className="text-sm" role="alert">
+          Checkout could not load: {state.error.message}
+        </p>
+      </Shell>
+    )
+  }
+
+  const { checkout } = state
+  const totals: SessionTotals = {
+    subtotal: checkout.total.subtotal.amount,
+    shipping: checkout.shipping ? checkout.total.shippingRate.amount : undefined,
+    tax: checkout.tax.status === 'ready' ? checkout.total.taxExclusive.amount : undefined,
+    total: checkout.total.total.amount,
+  }
+
+  const pay = async () => {
+    setError(undefined)
+    setPaying(true)
+    // On success Stripe redirects to the session's return_url (the confirmation page).
+    const result = await checkout.confirm()
+    if (result.type === 'error') {
+      setError(result.error.message)
+      setPaying(false)
+    }
+  }
+
+  return (
+    <Shell summary={<OrderSummary items={items} totals={totals} />}>
+      <section aria-labelledby={emailLabelId} className="flex flex-col gap-3">
+        <h2 className={label} id={emailLabelId}>
+          Email
+        </h2>
+        <div className="flex items-baseline justify-between gap-4 border-b pb-3">
+          <p className="truncate">{email}</p>
+          <button className={quietAction} onClick={onChangeEmail} type="button">
+            Change
+          </button>
+        </div>
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <h2 className={label}>Shipping address</h2>
+        <ShippingAddressElement />
+      </section>
+
+      {checkout.shippingOptions.length > 0 && (
+        <section className="flex flex-col gap-4">
+          <h2 className={label}>Shipping</h2>
+          {checkout.shippingOptions.length === 1 ? (
+            <p className="flex justify-between border-b pb-3">
+              <span>{checkout.shippingOptions[0].displayName}</span>
+              <span>{checkout.shippingOptions[0].amount}</span>
+            </p>
+          ) : (
+            <fieldset className="flex flex-col">
+              <legend className="sr-only">Shipping method</legend>
+              {checkout.shippingOptions.map((option) => (
+                <label className="flex cursor-pointer items-center gap-3 border-b py-3" key={option.id}>
+                  <input
+                    checked={checkout.shipping?.shippingOption.id === option.id}
+                    className="accent-foreground"
+                    name="shipping-option"
+                    onChange={() => checkout.updateShippingOption(option.id)}
+                    type="radio"
+                  />
+                  <span className="flex-1">{option.displayName}</span>
+                  <span>{option.amount}</span>
+                </label>
+              ))}
+            </fieldset>
+          )}
+        </section>
+      )}
+
+      <section className="flex flex-col gap-4">
+        <h2 className={label}>Payment</h2>
+        <PaymentElement options={{ layout: 'tabs' }} />
+      </section>
+
+      <div className="flex flex-col gap-3">
+        {error && (
+          <p className="text-sm" role="alert">
+            {error}
+          </p>
+        )}
+        <button
+          className={filledButton}
+          disabled={!checkout.canConfirm || paying}
+          onClick={pay}
+          type="button"
+        >
+          {paying ? 'Processing' : `Pay ${totals.total}`}
+        </button>
+      </div>
+    </Shell>
+  )
+}
+
+function describeInitiateError(err: unknown): string {
+  const raw = err instanceof Error ? err.message : ''
+  try {
+    const parsed = JSON.parse(raw)
+    if (parsed?.cause?.code === 'OutOfStock') {
+      return 'An edition in your cart has just sold out. Remove it from your cart to continue.'
+    }
+    if (typeof parsed?.message === 'string') return parsed.message
+  } catch {
+    // not JSON
+  }
+  return 'Checkout could not start. Check your email address and try again.'
 }

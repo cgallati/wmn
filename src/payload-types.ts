@@ -953,6 +953,7 @@ export interface Transaction {
     | null;
   paymentMethod?: 'stripe' | null;
   stripe?: {
+    checkoutSessionID?: string | null;
     customerID?: string | null;
     paymentIntentID?: string | null;
   };
@@ -1780,6 +1781,7 @@ export interface TransactionsSelect<T extends boolean = true> {
   stripe?:
     | T
     | {
+        checkoutSessionID?: T;
         customerID?: T;
         paymentIntentID?: T;
       };
