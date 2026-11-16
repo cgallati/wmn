@@ -59,6 +59,10 @@ export const ConfirmOrder: React.FC = () => {
       // ignore
     }
     if (!email || !cart?.items?.length) {
+      // Stripe only returns here after payment, so this cart is paid for even if this tab
+      // cannot confirm it. The webhook records the order; empty the cart so it is not bought
+      // twice.
+      if (cart?.items?.length) void clearCart().catch(() => undefined)
       setState({ type: 'paid-pending' })
       return
     }
@@ -80,6 +84,7 @@ export const ConfirmOrder: React.FC = () => {
         router.replace(`/orders/${orderID}?${query.toString()}`)
       })
       .catch(() => {
+        void clearCart().catch(() => undefined)
         setState({
           type: 'error',
           message:
