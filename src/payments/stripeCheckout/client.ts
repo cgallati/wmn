@@ -1,4 +1,4 @@
-import type { PaymentAdapterClient } from '@payloadcms/plugin-ecommerce/types'
+import type { PaymentAdapterClient } from "@payloadcms/plugin-ecommerce/types";
 
 /**
  * Client half of the Checkout Sessions adapter. Same shape as the plugin's
@@ -6,8 +6,8 @@ import type { PaymentAdapterClient } from '@payloadcms/plugin-ecommerce/types'
  * Stripe module (which pulls in the server-side `stripe` package).
  */
 export const stripeCheckoutAdapterClient = (): PaymentAdapterClient => ({
-  name: 'stripe',
-  label: 'Card',
+  name: "stripe",
+  label: "Card",
   initiatePayment: true,
   confirmOrder: true,
-})
+});

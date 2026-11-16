@@ -154,6 +154,22 @@ const run = async () => {
     payload.logger.info(`Created ${productSlug}`);
   }
 
+  // A test shipping rate so the preview shop opens. Will sets real ones in Shop settings.
+  const settings = await payload.findGlobal({ slug: "shopSettings", depth: 0 });
+  if (!settings.shippingRates?.length) {
+    await payload.updateGlobal({
+      slug: "shopSettings",
+      context,
+      data: {
+        shippingRates: [
+          { label: "Flat mailer (test rate)", price: 15, minDays: 5, maxDays: 8 },
+        ],
+        shippingCountries: ["US"],
+      },
+    });
+    payload.logger.info("Added a test shipping rate");
+  }
+
   // A way into the shop from the preview's nav. Preview database only.
   const header = await payload.findGlobal({ slug: "header", depth: 0 });
   const nav = header.navItems ?? [];

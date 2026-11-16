@@ -9,7 +9,7 @@ import {
   ShippingAddressElement,
   useCheckoutElements,
 } from '@stripe/react-stripe-js/checkout'
-import { loadStripe } from '@stripe/stripe-js'
+import { loadStripe, type StripeCheckoutDeliveryEstimate } from '@stripe/stripe-js'
 import Link from 'next/link'
 import React, { useEffect, useId, useMemo, useState } from 'react'
 
@@ -237,7 +237,10 @@ function PaymentSteps({
           <h2 className={label}>Shipping</h2>
           {checkout.shippingOptions.length === 1 ? (
             <p className="flex justify-between border-b pb-3">
-              <span>{checkout.shippingOptions[0].displayName}</span>
+              <span>
+                {checkout.shippingOptions[0].displayName}
+                <Estimate estimate={checkout.shippingOptions[0].deliveryEstimate} />
+              </span>
               <span>{checkout.shippingOptions[0].amount}</span>
             </p>
           ) : (
@@ -252,7 +255,10 @@ function PaymentSteps({
                     onChange={() => checkout.updateShippingOption(option.id)}
                     type="radio"
                   />
-                  <span className="flex-1">{option.displayName}</span>
+                  <span className="flex-1">
+                    {option.displayName}
+                    <Estimate estimate={option.deliveryEstimate} />
+                  </span>
                   <span>{option.amount}</span>
                 </label>
               ))}
@@ -282,6 +288,17 @@ function PaymentSteps({
         </button>
       </div>
     </Shell>
+  )
+}
+
+/** "5–8 business days" under a shipping option, when Will set an estimate. */
+function Estimate({ estimate }: { estimate: StripeCheckoutDeliveryEstimate | null }) {
+  const min = estimate?.minimum?.value
+  const max = estimate?.maximum?.value
+  if (!min && !max) return null
+  const range = min && max && min !== max ? `${min}\u2013${max}` : String(max ?? min)
+  return (
+    <span className="block text-sm text-[#404040]">{range} business days</span>
   )
 }
 

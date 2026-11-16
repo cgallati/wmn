@@ -12,6 +12,7 @@ import { notFound } from "next/navigation";
 import React, { Suspense } from "react";
 import { getFirstImage, isPortrait } from "@/components/product/utils";
 import { cn } from "@/utilities/cn";
+import { getShopStatus } from "@/utilities/shopStatus";
 import { Metadata } from "next";
 
 type Args = {
@@ -20,7 +21,14 @@ type Args = {
   }>;
 };
 
+/** Dark until the shop opens; an admin previewing a draft still sees the page. */
+const shopClosedFor = async () => {
+  const { isEnabled: draft } = await draftMode()
+  return !draft && !(await getShopStatus()).open
+}
+
 export async function generateMetadata({ params }: Args): Promise<Metadata> {
+  if (await shopClosedFor()) return notFound()
   const { slug } = await params;
   const product = await queryProductBySlug({ slug });
 
@@ -65,6 +73,7 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
 }
 
 export default async function ProductPage({ params }: Args) {
+  if (await shopClosedFor()) return notFound()
   const { slug } = await params;
   const product = await queryProductBySlug({ slug });
 

@@ -133,10 +133,12 @@ export interface Config {
   globals: {
     header: Header;
     footer: Footer;
+    shopSettings: ShopSetting;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
+    shopSettings: ShopSettingsSelect<false> | ShopSettingsSelect<true>;
   };
   locale: null;
   widgets: {
@@ -1919,6 +1921,61 @@ export interface Footer {
   createdAt?: string | null;
 }
 /**
+ * The shop opens on the site once there is at least one shipping rate here and at least one published print with editions left.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "shopSettings".
+ */
+export interface ShopSetting {
+  id: string;
+  /**
+   * Buyers choose one of these at checkout. Shipping is taxed where required; Stripe Tax decides per address.
+   */
+  shippingRates?:
+    | {
+        label: string;
+        /**
+         * In US dollars.
+         */
+        price: number;
+        /**
+         * Shortest delivery estimate, business days.
+         */
+        minDays?: number | null;
+        /**
+         * Longest delivery estimate, business days.
+         */
+        maxDays?: number | null;
+        id?: string | null;
+      }[]
+    | null;
+  shippingCountries: (
+    | 'US'
+    | 'CA'
+    | 'GB'
+    | 'IE'
+    | 'AU'
+    | 'NZ'
+    | 'DE'
+    | 'FR'
+    | 'NL'
+    | 'BE'
+    | 'ES'
+    | 'IT'
+    | 'PT'
+    | 'AT'
+    | 'CH'
+    | 'SE'
+    | 'NO'
+    | 'DK'
+    | 'FI'
+    | 'JP'
+    | 'MX'
+  )[];
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header_select".
  */
@@ -1979,6 +2036,25 @@ export interface FooterSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "shopSettings_select".
+ */
+export interface ShopSettingsSelect<T extends boolean = true> {
+  shippingRates?:
+    | T
+    | {
+        label?: T;
+        price?: T;
+        minDays?: T;
+        maxDays?: T;
+        id?: T;
+      };
+  shippingCountries?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

@@ -60,6 +60,10 @@ export function CartModal({ iconOnly = false }: { iconOnly?: boolean }) {
 
   const items = cart?.items ?? [];
 
+  // While the shop is dark (see Shop settings), the cart stays out of the rail.
+  const shopOpen = useShopOpen();
+  if (shopOpen !== true && !items.length) return null;
+
   return (
     <>
       <OpenCartButton
@@ -220,4 +224,24 @@ export function CartModal({ iconOnly = false }: { iconOnly?: boolean }) {
       )}
     </>
   );
+}
+
+/** Whether the shop is open; undefined until known. Shared by both cart triggers. */
+let shopOpenRequest: Promise<boolean> | undefined;
+function useShopOpen(): boolean | undefined {
+  const [open, setOpen] = useState<boolean>();
+  useEffect(() => {
+    shopOpenRequest ??= fetch("/shop/status", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : { open: false }))
+      .then((d: { open?: boolean }) => Boolean(d.open))
+      .catch(() => false);
+    let active = true;
+    shopOpenRequest.then((value) => {
+      if (active) setOpen(value);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+  return open;
 }
