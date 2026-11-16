@@ -46,15 +46,15 @@ export const ProductGridItem: React.FC<Props> = ({ product, soldOut: soldOutProp
       <Link
         href={href}
         className={cn(
-          'mt-4 flex items-baseline justify-between gap-4 text-xs uppercase tracking-[0.1em] outline-none focus-visible:text-primary focus-visible:underline focus-visible:underline-offset-4',
-          'text-primary/50 group-hover:text-primary',
+          // Title and price are what a buyer scans for: full ink at caption size, not chrome.
+          'mt-4 flex items-baseline justify-between gap-4 text-sm text-foreground outline-none underline-offset-4 group-hover:underline focus-visible:underline',
         )}
       >
         <span>{title}</span>
         {soldOut ? (
-          <span>Sold out</span>
+          <span className="whitespace-nowrap text-[#525252]">Sold out</span>
         ) : typeof low === 'number' ? (
-          <span className="whitespace-nowrap">
+          <span className="whitespace-nowrap tabular-nums">
             {typeof high === 'number' && high !== low ? 'From ' : null}
             <Price as="span" amount={low} />
           </span>
