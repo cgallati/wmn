@@ -64,12 +64,12 @@ export function ExplicitGate({ explicit, id, title, children, className }: Props
           <button
             type="button"
             onClick={reveal}
-            className="bg-background px-4 py-3 text-center text-xs font-medium uppercase leading-snug tracking-[0.1em] text-primary outline-none hover:bg-primary hover:text-primary-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            // Will's explicit-content badge (Warning Red block, white type), scaled up to a
+            // readable, tappable control. Red is reserved for exactly this meaning.
+            className="bg-red-600 px-4 py-2.5 text-center text-xs uppercase leading-none text-white outline-none transition-colors hover:bg-red-700 focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2 motion-reduce:transition-none"
           >
-            <span className="block text-primary/70">
-              Explicit content
-            </span>
-            <span className="block">
+            <span className="block font-bold tracking-[0.05em]">Explicit content</span>
+            <span className="mt-1.5 block font-medium tracking-[0.1em]">
               Show image<span className="sr-only"> of {title}</span>
             </span>
           </button>
