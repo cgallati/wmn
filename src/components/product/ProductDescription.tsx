@@ -10,7 +10,7 @@ import React, { Suspense, useMemo } from 'react'
 import { VariantSelector } from './VariantSelector'
 import { getPriceRange, getVariants, hasVariants as productHasVariants, isSoldOut } from './utils'
 
-type ArtworkRef = { slug?: string | null; year?: number | null; series?: string | null } | null
+type ArtworkRef = { year?: number | null; series?: string | null } | null
 
 type Row = { label: string; value: React.ReactNode }
 

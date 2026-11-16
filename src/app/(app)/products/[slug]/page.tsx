@@ -165,15 +165,6 @@ export default async function ProductPage({ params }: Args) {
 
           <div className={cn(!portrait && "max-w-3xl")}>
             <ProductDescription artwork={artwork} product={product} />
-
-            {artwork?.slug ? (
-              <Link
-                href={`/artwork/${artwork.slug}`}
-                className="mt-12 inline-block text-xs font-medium uppercase tracking-[0.1em] text-primary/50 outline-none hover:text-primary focus-visible:text-primary focus-visible:underline focus-visible:underline-offset-4"
-              >
-                View artwork
-              </Link>
-            ) : null}
           </div>
         </div>
       </div>
@@ -227,7 +218,7 @@ const queryArtworkForProduct = async (productId: Product["id"]) => {
     limit: 1,
     overrideAccess: false,
     pagination: false,
-    select: { slug: true, year: true, series: true },
+    select: { year: true, series: true },
     where: {
       and: [
         { availablePrints: { contains: productId } },
