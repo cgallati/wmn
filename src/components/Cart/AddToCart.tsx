@@ -5,7 +5,8 @@ import type { Product, Variant } from '@/payload-types'
 import { useCart } from '@payloadcms/plugin-ecommerce/client/react'
 import { useSearchParams } from 'next/navigation'
 import React, { useCallback, useMemo } from 'react'
-import { toast } from 'sonner'
+export const OPEN_CART_EVENT = 'wmn:open-cart'
+
 type Props = {
   product: Product
 }
@@ -43,7 +44,8 @@ export function AddToCart({ product }: Props) {
         product: product.id,
         variant: selectedVariant?.id ?? undefined,
       }).then(() => {
-        toast('Added to cart.')
+        // The cart panel in the rail opens to show what was added.
+        window.dispatchEvent(new CustomEvent(OPEN_CART_EVENT))
       })
     },
     [addItem, product, selectedVariant],

@@ -4,6 +4,9 @@ import { getPayload } from 'payload'
 import React from 'react'
 import { isSoldOut } from '@/components/product/utils'
 
+// Inventory changes when orders complete, and nothing revalidates this route, so render per request.
+export const dynamic = 'force-dynamic'
+
 export const metadata = {
   description: 'Limited edition prints by Will M Nichols.',
   title: 'Shop',

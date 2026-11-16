@@ -58,6 +58,8 @@ Run a dev server to validate UI changes for runtime errors before handing off fo
 - Check which ports are in use first, and start yours on a free one (for example `pnpm dev -p 3100`). Never stop or restart the user's server.
 - Point it at a throwaway Docker Mongo with dummy env values, never the real database. Use placeholder fixtures only, and stop the container when done.
 - Run it in the background. Check the server log and the browser console for errors, load the changed routes, and report what you saw.
+- Next 16 allows one dev server per project directory. If the user's server is already running from this directory, do not stop it. Build with throwaway env and serve the build with `next start -p <free port>`. In production mode Next blocks optimizing images from localhost, so for local validation only, temporarily set `images.dangerouslyAllowLocalIP: true` in `next.config.js` and revert it before committing.
+- Create fixtures through the REST API (`/api/users/first-register`, `/api/media`, `/api/products`, `/api/variants`), not against the real database.
 - Stop your server when finished.
 
 ### Port Conflicts

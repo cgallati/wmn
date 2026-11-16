@@ -47,7 +47,7 @@ export function ExplicitGate({ explicit, id, title, children, className }: Props
   const hidden = !shown
 
   return (
-    <div className={cn('relative', className)}>
+    <div className={cn('relative overflow-hidden', className)}>
       <div
         aria-hidden={hidden || undefined}
         // `inert` keeps the blurred image out of tab order and the accessibility tree

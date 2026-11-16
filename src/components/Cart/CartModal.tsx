@@ -9,6 +9,7 @@ import React, { useEffect, useId, useMemo, useRef, useState } from 'react'
 
 import { DeleteItemButton } from './DeleteItemButton'
 import { EditItemQuantityButton } from './EditItemQuantityButton'
+import { OPEN_CART_EVENT } from './AddToCart'
 import { OpenCartButton } from './OpenCart'
 import type { CartItem } from '@/components/Cart'
 
@@ -30,6 +31,12 @@ export function CartModal({ iconOnly = false }: { iconOnly?: boolean }) {
     // Close the cart when the route changes.
     setIsOpen(false)
   }, [pathname])
+
+  useEffect(() => {
+    const open = () => setIsOpen(true)
+    window.addEventListener(OPEN_CART_EVENT, open)
+    return () => window.removeEventListener(OPEN_CART_EVENT, open)
+  }, [])
 
   useEffect(() => {
     if (!isOpen) return
@@ -119,7 +126,7 @@ export function CartModal({ iconOnly = false }: { iconOnly?: boolean }) {
                     <li className="flex gap-4 border-t py-6" key={item.id ?? i}>
                       <Link
                         aria-hidden="true"
-                        className="block w-20 shrink-0 self-start"
+                        className="block w-20 shrink-0 self-start overflow-hidden"
                         href={`/products/${product.slug}`}
                         tabIndex={-1}
                       >
