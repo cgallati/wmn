@@ -126,7 +126,7 @@ export function CheckoutPage() {
             type="email"
             value={email}
           />
-          <p className="text-sm text-[#404040]">Used for your receipt and to look up your order.</p>
+          <p className="text-sm text-[#404040]">Stripe sends your receipt here.</p>
         </div>
         {cartChanged && (
           <p className="text-sm" role="status">

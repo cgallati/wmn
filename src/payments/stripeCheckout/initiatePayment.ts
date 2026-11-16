@@ -128,7 +128,11 @@ export const initiatePayment =
         shipping_options: shippingOptions,
         return_url: `${serverURL}/checkout/confirm-order?session_id={CHECKOUT_SESSION_ID}`,
         metadata: { cartID },
-        payment_intent_data: { metadata: { cartID } },
+        payment_intent_data: {
+          metadata: { cartID },
+          // The buyer's only email is Stripe's receipt; receipt_email makes Stripe send it.
+          receipt_email: customerEmail,
+        },
       });
 
       if (!session.client_secret)
