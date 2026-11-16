@@ -198,6 +198,47 @@ Other checkout pieces:
 4. **Public launch:** Will adds "Shop" to the Header global in the CMS, then submit the sitemap.
 5. Post-launch: v4 upgrade (if not already done), international shipping, discount codes (not built into the plugin as of 3.93), and an email list.
 
+## Production readiness (as of 2026-11-15)
+
+The shop stays dark in production until Will has **a shipping rate in Shop settings** and **a published print with an edition left**. Until then `/shop`, `/products/*` and `/checkout` return 404 and the cart is hidden. Once both are true it opens on its own, with no flag or redeploy. The "Prints" nav item is added by Will in the Header global.
+
+**Before merging to `main`** (the deploy is harmless while the shop is dark, but these must be right before it opens):
+
+- [ ] **Production env:** set `NEXT_PUBLIC_ENABLE_SHOP=true`. Otherwise the frozen Header never renders the cart, even when the shop is open; the code now gates the cart itself.
+- [ ] **Production env:** set `NEXT_PUBLIC_SERVER_URL` and `PAYLOAD_PUBLIC_SERVER_URL` to `https://www.willmnicholsphoto.com`. Today they are `https://wmn-shop.vercel.app` for every environment, so Stripe would return buyers to the vercel.app domain.
+- [ ] **Production database:** delete the template test product ("PRINT", sold out) and its test order and transaction. It keeps the shop dark today, but once the shop opens it would appear in the sold-out archive.
+- [ ] **Merge path:** `claude/shop-ui-1b6278` into `feat/shop-rework`, then `main`. Spot-check the portfolio on the Preview deploy first: `Media` now uses relative image URLs, the `/artwork/[slug]` route is removed, and the header cache fix is in.
+
+**Before the shop opens (Stripe, live mode):**
+
+- [ ] Put live keys in **Production only**. Today one test key is shared by Production, Preview and Development, which is fine until launch.
+- [ ] Register a live webhook endpoint at `https://www.willmnicholsphoto.com/api/payments/stripe/webhooks` for `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed` and `checkout.session.expired`. Put its signing secret in Production as `STRIPE_WEBHOOKS_SIGNING_SECRET`.
+- [ ] **Stripe Tax:** activate it in live mode, set the origin address, and add the Georgia registration. Without a registration, tax is $0.
+- [ ] **Payment methods (Dashboard):** decide on Link (its "save my info" box blocks Pay until a phone is entered or it is unticked), Cash App, Affirm and Klarna.
+- [ ] **Emails (Dashboard):** turn on customer receipts for successful payments and payment notifications to Will. No email adapter is configured, so the site sends no order emails, and find-order emails are not sent either.
+
+**Before the shop opens (Will, in the admin):**
+
+- [ ] Shop settings: real shipping rates (label, price, delivery estimate) and ship-to countries.
+- [ ] Prints: sizes as variants, inventory per size equal to the edition size, prices, paper, process, signed, production time, and the explicit flag where needed.
+- [ ] Policies: Shipping, Returns/Damage, Privacy, Terms and the Print Disclosure (see the ops doc). There is no checkout link to them yet; add one when the pages exist.
+- [ ] Add "Prints" to the Header nav when ready. With the header cache fix it appears on the next page view.
+
+**Known gaps, acceptable for a soft launch:**
+
+- **Last-edition race:** two buyers can pay for the last edition at once. Inventory can then go negative, and one order needs a refund. Watch for it, and add an alert or test later.
+- **Accounts:** `/create-account` and `/login` are still public, though checkout is guest-only. Consider disabling self-signup.
+- **Email adapter:** needed for order emails and find-order (`@payloadcms/email-resend`).
+- **Order fulfillment in the admin:** status, tracking and packing slip are still to come (§3).
+- **SEO titles:** they still say "Payload Ecommerce Template" (§0.4).
+
+**Preview scaffolding to remove after review:**
+
+- Vercel Authentication was turned **off** for the wmn project so Will can view the preview. Turn it back on.
+- Revoke the "Stripe test webhooks for shop previews" automation bypass.
+- Delete the Stripe test endpoint `we_1UcGjbRfUGsoOWjhrPj5NZeI`.
+- Drop the `wmn-preview` database, or keep it for future reviews.
+
 ## Decisions needed
 
 - [ ] **Will:** sizes, paper and framing offered; edition size per size; prices. Will he print himself or use a lab?
