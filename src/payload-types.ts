@@ -303,6 +303,28 @@ export interface Product {
   priceInUSDEnabled?: boolean | null;
   priceInUSD?: number | null;
   relatedProducts?: (string | Product)[] | null;
+  /**
+   * Edition size for each size. Set each size variant's inventory to this number.
+   */
+  editionSize?: number | null;
+  /**
+   * Artist's proofs, not offered for sale.
+   */
+  artistProofs?: number | null;
+  paper?: string | null;
+  printProcess?: string | null;
+  /**
+   * Each print is signed by the artist.
+   */
+  signed?: boolean | null;
+  /**
+   * Days from order to shipment.
+   */
+  productionTime?: number | null;
+  /**
+   * Blur this print behind a content notice in the shop until the visitor chooses to view it.
+   */
+  explicitContent?: boolean | null;
   meta?: {
     title?: string | null;
     /**
@@ -1659,6 +1681,13 @@ export interface ProductsSelect<T extends boolean = true> {
   priceInUSDEnabled?: T;
   priceInUSD?: T;
   relatedProducts?: T;
+  editionSize?: T;
+  artistProofs?: T;
+  paper?: T;
+  printProcess?: T;
+  signed?: T;
+  productionTime?: T;
+  explicitContent?: T;
   meta?:
     | T
     | {

@@ -1,67 +1,92 @@
 'use client'
 
 import { Price } from '@/components/Price'
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet'
 import { useCart } from '@payloadcms/plugin-ecommerce/client/react'
-import { ShoppingCart } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useId, useMemo, useRef, useState } from 'react'
 
 import { DeleteItemButton } from './DeleteItemButton'
 import { EditItemQuantityButton } from './EditItemQuantityButton'
 import { OpenCartButton } from './OpenCart'
-import { Button } from '@/components/ui/button'
-import { Product } from '@/payload-types'
 import type { CartItem } from '@/components/Cart'
 
+const labelClass = 'text-xs font-medium uppercase tracking-[0.1em]'
+
+/**
+ * The cart lives in the left rail. Opening it slides a flat panel out beside the rail on
+ * desktop (full width under the top bar on mobile). It is not a modal: the page stays
+ * visible and reachable, Escape closes it, and focus returns to the trigger.
+ */
 export function CartModal({ iconOnly = false }: { iconOnly?: boolean }) {
   const { cart } = useCart()
   const [isOpen, setIsOpen] = useState(false)
-
+  const panelId = useId()
+  const triggerRef = useRef<HTMLButtonElement>(null)
   const pathname = usePathname()
 
   useEffect(() => {
-    // Close the cart modal when the pathname changes.
+    // Close the cart when the route changes.
     setIsOpen(false)
   }, [pathname])
+
+  useEffect(() => {
+    if (!isOpen) return
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsOpen(false)
+        triggerRef.current?.focus()
+      }
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [isOpen])
 
   const totalQuantity = useMemo(() => {
     if (!cart || !cart.items || !cart.items.length) return undefined
     return cart.items.reduce((quantity, item) => (item.quantity || 0) + quantity, 0)
   }, [cart])
 
+  const items = cart?.items ?? []
+
   return (
-    <Sheet onOpenChange={setIsOpen} open={isOpen}>
-      <SheetTrigger asChild>
-        <OpenCartButton quantity={totalQuantity} iconOnly={iconOnly} />
-      </SheetTrigger>
+    <>
+      <OpenCartButton
+        aria-controls={panelId}
+        aria-expanded={isOpen}
+        iconOnly={iconOnly}
+        onClick={() => setIsOpen((open) => !open)}
+        quantity={totalQuantity}
+        ref={triggerRef}
+      />
 
-      <SheetContent className="flex flex-col">
-        <SheetHeader>
-          <SheetTitle>My Cart</SheetTitle>
-
-          <SheetDescription>Manage your cart here, add items to view the total.</SheetDescription>
-        </SheetHeader>
-
-        {!cart || cart?.items?.length === 0 ? (
-          <div className="text-center flex flex-col items-center gap-2">
-            <ShoppingCart className="h-16" />
-            <p className="text-center text-2xl font-bold">Your cart is empty.</p>
+      {isOpen && (
+        <aside
+          aria-label="Cart"
+          className="fixed bottom-0 left-0 right-0 top-16 z-30 flex flex-col overflow-y-auto border-t bg-background lg:left-64 lg:right-auto lg:top-0 lg:w-[22rem] lg:border-r lg:border-t-0"
+          id={panelId}
+        >
+          <div className="flex items-center justify-between px-6 py-6">
+            <h2 className={`${labelClass} text-primary`}>Cart</h2>
+            <button
+              className={`${labelClass} -mr-2 flex h-11 items-center px-2 text-primary/50 outline-none hover:text-primary focus-visible:text-primary focus-visible:underline focus-visible:underline-offset-4`}
+              onClick={() => {
+                setIsOpen(false)
+                triggerRef.current?.focus()
+              }}
+              type="button"
+            >
+              Close
+            </button>
           </div>
-        ) : (
-          <div className="grow flex px-4">
-            <div className="flex flex-col justify-between w-full">
-              <ul className="grow overflow-auto py-4">
-                {cart?.items?.map((item: CartItem, i) => {
+
+          {items.length === 0 ? (
+            <p className={`${labelClass} px-6 text-primary/50`}>Your cart is empty.</p>
+          ) : (
+            <div className="flex grow flex-col justify-between px-6 pb-6">
+              <ul className="flex flex-col">
+                {items.map((item: CartItem, i) => {
                   const product = item.product
                   const variant = item.variant
 
@@ -78,84 +103,58 @@ export function CartModal({ iconOnly = false }: { iconOnly?: boolean }) {
                       ? product.gallery?.[0]?.image
                       : undefined
 
-                  let image = firstGalleryImage || metaImage
-                  let price = product.priceInUSD
-
+                  const image = firstGalleryImage || metaImage
                   const isVariant = Boolean(variant) && typeof variant === 'object'
-
-                  if (isVariant) {
-                    price = variant?.priceInUSD
-
-                    const imageVariant = product.gallery?.find((item) => {
-                      if (!item.variantOption) return false
-                      const variantOptionID =
-                        typeof item.variantOption === 'object'
-                          ? item.variantOption.id
-                          : item.variantOption
-
-                      const hasMatch = variant?.options?.some((option) => {
-                        if (typeof option === 'object') return option.id === variantOptionID
-                        else return option === variantOptionID
-                      })
-
-                      return hasMatch
-                    })
-
-                    if (imageVariant && typeof imageVariant.image === 'object') {
-                      image = imageVariant.image
-                    }
-                  }
+                  const price = isVariant && variant ? variant.priceInUSD : product.priceInUSD
+                  const options =
+                    isVariant && variant
+                      ? (variant.options ?? [])
+                          .map((option) => (typeof option === 'object' ? option.label : null))
+                          .filter(Boolean)
+                          .join(', ')
+                      : ''
+                  const explicit = Boolean(product.explicitContent)
 
                   return (
-                    <li className="flex w-full flex-col" key={i}>
-                      <div className="relative flex w-full flex-row justify-between px-1 py-4">
-                        <div className="absolute z-40 -mt-2 ml-[55px]">
-                          <DeleteItemButton item={item} />
-                        </div>
-                        <Link
-                          className="z-30 flex flex-row space-x-4"
-                          href={`/products/${(item.product as Product)?.slug}`}
-                        >
-                          <div className="relative h-16 w-16 cursor-pointer overflow-hidden rounded-md border border-neutral-300 bg-neutral-300 dark:border-neutral-700 dark:bg-neutral-900 dark:hover:bg-neutral-800">
-                            {image?.url && (
-                              <Image
-                                alt={image?.alt || product?.title || ''}
-                                className="h-full w-full object-cover"
-                                height={94}
-                                src={image.url}
-                                width={94}
-                              />
-                            )}
-                          </div>
+                    <li className="flex gap-4 border-t py-6" key={item.id ?? i}>
+                      <Link
+                        aria-hidden="true"
+                        className="block w-20 shrink-0 self-start"
+                        href={`/products/${product.slug}`}
+                        tabIndex={-1}
+                      >
+                        {image?.url && image.width && image.height ? (
+                          <Image
+                            alt=""
+                            className={`h-auto w-full object-contain ${explicit ? 'blur-md' : ''}`}
+                            height={image.height}
+                            sizes="80px"
+                            src={image.url}
+                            width={image.width}
+                          />
+                        ) : null}
+                      </Link>
 
-                          <div className="flex flex-1 flex-col text-base">
-                            <span className="leading-tight">{product?.title}</span>
-                            {isVariant && variant ? (
-                              <p className="text-sm text-neutral-500 dark:text-neutral-400 capitalize">
-                                {variant.options
-                                  ?.map((option) => {
-                                    if (typeof option === 'object') return option.label
-                                    return null
-                                  })
-                                  .join(', ')}
-                              </p>
-                            ) : null}
-                          </div>
-                        </Link>
-                        <div className="flex h-16 flex-col justify-between">
+                      <div className="flex min-w-0 flex-1 flex-col gap-3 text-sm">
+                        <div className="flex items-baseline justify-between gap-4">
+                          <Link className="leading-snug hover:underline" href={`/products/${product.slug}`}>
+                            {product.title}
+                          </Link>
                           {typeof price === 'number' && (
-                            <Price
-                              amount={price}
-                              className="flex justify-end space-y-2 text-right text-sm"
-                            />
+                            <Price as="span" amount={price} className="whitespace-nowrap" />
                           )}
-                          <div className="ml-auto flex h-9 flex-row items-center rounded-lg border">
+                        </div>
+                        {options ? <p className="text-[#404040]">{options}</p> : null}
+
+                        <div className="mt-auto flex items-center justify-between">
+                          <div className="-ml-2 flex items-center">
                             <EditItemQuantityButton item={item} type="minus" />
-                            <p className="w-6 text-center">
-                              <span className="w-full text-sm">{item.quantity}</span>
-                            </p>
+                            <span aria-label={`Quantity ${item.quantity}`} className="w-5 text-center">
+                              {item.quantity}
+                            </span>
                             <EditItemQuantityButton item={item} type="plus" />
                           </div>
+                          <DeleteItemButton item={item} label={product.title} />
                         </div>
                       </div>
                     </li>
@@ -163,29 +162,25 @@ export function CartModal({ iconOnly = false }: { iconOnly?: boolean }) {
                 })}
               </ul>
 
-              <div className="px-4">
-                <div className="py-4 text-sm text-neutral-500 dark:text-neutral-400">
-                  {typeof cart?.subtotal === 'number' && (
-                    <div className="mb-3 flex items-center justify-between border-b border-neutral-200 pb-1 pt-1 dark:border-neutral-700">
-                      <p>Total</p>
-                      <Price
-                        amount={cart?.subtotal}
-                        className="text-right text-base text-black dark:text-white"
-                      />
-                    </div>
-                  )}
-
-                  <Button asChild>
-                    <Link className="w-full" href="/checkout">
-                      Proceed to Checkout
-                    </Link>
-                  </Button>
-                </div>
+              <div className="flex flex-col gap-6 border-t pt-6">
+                {typeof cart?.subtotal === 'number' && (
+                  <div className="flex items-baseline justify-between text-sm">
+                    <p>Subtotal</p>
+                    <Price as="p" amount={cart.subtotal} />
+                  </div>
+                )}
+                <p className="text-sm text-[#404040]">Shipping and tax are calculated at checkout.</p>
+                <Link
+                  className="bg-foreground px-8 py-4 text-center text-xs font-medium uppercase tracking-[0.1em] text-background outline-none transition-opacity hover:opacity-85 focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-4"
+                  href="/checkout"
+                >
+                  Checkout
+                </Link>
               </div>
             </div>
-          </div>
-        )}
-      </SheetContent>
-    </Sheet>
+          )}
+        </aside>
+      )}
+    </>
   )
 }

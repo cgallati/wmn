@@ -1,10 +1,8 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
 import type { Product, Variant } from '@/payload-types'
 
 import { useCart } from '@payloadcms/plugin-ecommerce/client/react'
-import clsx from 'clsx'
 import { useSearchParams } from 'next/navigation'
 import React, { useCallback, useMemo } from 'react'
 import { toast } from 'sonner'
@@ -45,7 +43,7 @@ export function AddToCart({ product }: Props) {
         product: product.id,
         variant: selectedVariant?.id ?? undefined,
       }).then(() => {
-        toast.success('Item added to cart.')
+        toast('Added to cart.')
       })
     },
     [addItem, product, selectedVariant],
@@ -94,18 +92,28 @@ export function AddToCart({ product }: Props) {
     return false
   }, [selectedVariant, cart?.items, product])
 
+  const needsSelection = Boolean(product.enableVariants && variants.length && !selectedVariant)
+  const typeLabel =
+    product.variantTypes?.find((t): t is Exclude<typeof t, string | number> => typeof t === 'object')
+      ?.label ?? 'option'
+
+  const atLimit = !needsSelection && disabled
+
   return (
-    <Button
-      aria-label="Add to cart"
-      variant={'outline'}
-      className={clsx({
-        'hover:opacity-90': true,
-      })}
-      disabled={disabled || isLoading}
-      onClick={addToCart}
-      type="submit"
-    >
-      Add To Cart
-    </Button>
+    <div className="flex flex-col gap-3">
+      <button
+        className="w-full bg-foreground px-8 py-4 text-xs font-medium uppercase tracking-[0.1em] text-background outline-none transition-opacity hover:opacity-85 focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-4 disabled:cursor-not-allowed disabled:opacity-40 md:w-auto"
+        disabled={disabled || isLoading}
+        onClick={addToCart}
+        type="submit"
+      >
+        {needsSelection ? `Select ${String(typeLabel).toLowerCase()}` : 'Add to cart'}
+      </button>
+      {atLimit && (
+        <p className="text-xs uppercase tracking-[0.1em] text-primary/50">
+          The remaining editions are in your cart.
+        </p>
+      )}
+    </div>
   )
 }

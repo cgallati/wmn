@@ -1,79 +1,38 @@
-'use client'
-
-import type { Product } from '@/payload-types'
+import type { Media as MediaType, Product } from '@/payload-types'
 
 import { Media } from '@/components/Media'
-import { GridTileImage } from '@/components/Grid/tile'
-import { useSearchParams } from 'next/navigation'
-import React, { useEffect } from 'react'
-
-import { Carousel, CarouselApi, CarouselContent, CarouselItem } from '@/components/ui/carousel'
-import { DefaultDocumentIDType } from 'payload'
+import { ExplicitGate } from '@/components/product/ExplicitGate'
+import React from 'react'
 
 type Props = {
   gallery: NonNullable<Product['gallery']>
+  explicit?: boolean | null
+  productId: string | number
+  title: string
+  /** Responsive `sizes` hint for the main image. */
+  sizes?: string
 }
 
-export const Gallery: React.FC<Props> = ({ gallery }) => {
-  const searchParams = useSearchParams()
-  const [current, setCurrent] = React.useState(0)
-  const [api, setApi] = React.useState<CarouselApi>()
-
-  useEffect(() => {
-    if (!api) {
-      return
-    }
-  }, [api])
-
-  useEffect(() => {
-    const values = searchParams.values().toArray()
-
-    if (values && api) {
-      const index = gallery.findIndex((item) => {
-        if (!item.variantOption) return false
-
-        let variantID: DefaultDocumentIDType
-
-        if (typeof item.variantOption === 'object') {
-          variantID = item.variantOption.id
-        } else variantID = item.variantOption
-
-        return Boolean(values.find((value) => value === String(variantID)))
-      })
-      if (index !== -1) {
-        setCurrent(index)
-        api.scrollTo(index, true)
-      }
-    }
-  }, [searchParams, api, gallery])
+/** The print at its true aspect ratio. Any additional images follow, stacked, never cropped. */
+export const Gallery: React.FC<Props> = ({ gallery, explicit, productId, title, sizes }) => {
+  const images = gallery
+    .map((item) => item.image)
+    .filter((image): image is MediaType => typeof image === 'object' && image !== null)
 
   return (
-    <div>
-      <div className="relative w-full overflow-hidden mb-8">
-        <Media
-          resource={gallery[current].image}
-          className="w-full"
-          imgClassName="w-full rounded-lg"
-        />
+    <ExplicitGate explicit={explicit} id={productId} title={title}>
+      <div className="flex flex-col gap-8">
+        {images.map((image, i) => (
+          <Media
+            key={`${image.id}-${i}`}
+            className="w-full"
+            imgClassName="h-auto w-full object-contain"
+            priority={i === 0}
+            resource={image}
+            size={sizes}
+          />
+        ))}
       </div>
-
-      <Carousel setApi={setApi} className="w-full" opts={{ align: 'start', loop: false }}>
-        <CarouselContent>
-          {gallery.map((item, i) => {
-            if (typeof item.image !== 'object') return null
-
-            return (
-              <CarouselItem
-                className="basis-1/5"
-                key={`${item.image.id}-${i}`}
-                onClick={() => setCurrent(i)}
-              >
-                <GridTileImage active={i === current} media={item.image} />
-              </CarouselItem>
-            )
-          })}
-        </CarouselContent>
-      </Carousel>
-    </div>
+    </ExplicitGate>
   )
 }

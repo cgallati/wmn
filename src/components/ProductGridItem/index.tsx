@@ -2,101 +2,61 @@ import type { Product } from '@/payload-types'
 
 import Link from 'next/link'
 import React from 'react'
-import clsx from 'clsx'
 import { Media } from '@/components/Media'
 import { Price } from '@/components/Price'
+import { ExplicitGate } from '@/components/product/ExplicitGate'
+import { getFirstImage, getPriceRange, isSoldOut } from '@/components/product/utils'
+import { cn } from '@/utilities/cn'
 
 type Props = {
   product: Partial<Product>
   soldOut?: boolean
 }
 
-export const ProductGridItem: React.FC<Props> = ({ product, soldOut = false }) => {
-  const { gallery, priceInUSD, title, inventory, enableVariants } = product
-
-  let price = priceInUSD
-  let availableStock = inventory || 0
-
-  const variants = product.variants?.docs
-
-  if (variants && variants.length > 0) {
-    const variant = variants[0]
-    if (
-      variant &&
-      typeof variant === 'object' &&
-      variant?.priceInUSD &&
-      typeof variant.priceInUSD === 'number'
-    ) {
-      price = variant.priceInUSD
-    }
-
-    // Calculate total available stock from variants
-    if (enableVariants) {
-      availableStock = variants.reduce((total, v) => {
-        if (typeof v === 'object' && v.inventory) {
-          return total + v.inventory
-        }
-        return total
-      }, 0)
-    }
-  }
-
-  const image =
-    gallery?.[0]?.image && typeof gallery[0]?.image !== 'string' ? gallery[0]?.image : false
-
-  // Show low stock warning when stock is between 1 and 5
-  const isLowStock = !soldOut && availableStock > 0 && availableStock <= 5
+/**
+ * One print in the shop. The photograph sits at its true aspect ratio with a single
+ * label line beneath it. Nothing is cropped, badged or overlaid, except the content
+ * notice on explicit work.
+ */
+export const ProductGridItem: React.FC<Props> = ({ product, soldOut: soldOutProp }) => {
+  const soldOut = soldOutProp ?? isSoldOut(product)
+  const image = getFirstImage(product)
+  const { low, high } = getPriceRange(product)
+  const href = `/products/${product.slug}`
+  const title = product.title ?? ''
 
   return (
-    <Link
-      className={clsx('relative inline-block h-full w-full group', {
-        'opacity-60': soldOut,
-      })}
-      href={`/products/${product.slug}`}
-    >
-      <div className="relative">
-        {image ? (
-          <Media
-            className="relative w-full"
-            imgClassName={clsx('w-full h-auto object-contain transition duration-300 ease-in-out', {
-              'group-hover:opacity-90': !soldOut,
-              'grayscale': soldOut,
-            })}
-            resource={image}
-          />
-        ) : null}
+    <div className="group">
+      {image ? (
+        <ExplicitGate explicit={product.explicitContent} id={product.id ?? title} title={title}>
+          <Link href={href} tabIndex={-1} aria-hidden="true" className="block">
+            <Media
+              className="relative w-full bg-[hsl(210_40%_96.1%)]"
+              imgClassName="h-auto w-full object-contain"
+              resource={image}
+              size="(min-width: 1280px) 28vw, (min-width: 768px) 42vw, 100vw"
+            />
+          </Link>
+        </ExplicitGate>
+      ) : null}
 
-        {/* Sold Out Badge */}
-        {soldOut && (
-          <div className="absolute top-4 right-4 bg-red-600 text-white px-1.5 py-0.5 text-[0.5rem] font-bold uppercase tracking-wider leading-none">
-            Sold Out
-          </div>
-        )}
-
-        {/* Low Stock Badge */}
-        {isLowStock && (
-          <div className="absolute top-4 right-4 bg-orange-600 text-white px-1.5 py-0.5 text-[0.5rem] font-bold uppercase tracking-wider leading-none">
-            Only {availableStock} left
-          </div>
-        )}
-      </div>
-
-      <div
-        className={clsx(
-          'font-sans flex justify-between items-center mt-4 text-xs uppercase tracking-wider',
-          soldOut
-            ? 'text-primary/30'
-            : 'text-primary/50 group-hover:text-primary/100',
+      <Link
+        href={href}
+        className={cn(
+          'mt-4 flex items-baseline justify-between gap-4 text-xs uppercase tracking-[0.1em] outline-none focus-visible:text-primary focus-visible:underline focus-visible:underline-offset-4',
+          'text-primary/50 group-hover:text-primary',
         )}
       >
-        <div>{title}</div>
-
-        {typeof price === 'number' && (
-          <div>
-            <Price amount={price} />
-          </div>
-        )}
-      </div>
-    </Link>
+        <span>{title}</span>
+        {soldOut ? (
+          <span>Sold out</span>
+        ) : typeof low === 'number' ? (
+          <span className="whitespace-nowrap">
+            {typeof high === 'number' && high !== low ? 'From ' : null}
+            <Price as="span" amount={low} />
+          </span>
+        ) : null}
+      </Link>
+    </div>
   )
 }

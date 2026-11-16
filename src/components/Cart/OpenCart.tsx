@@ -1,47 +1,27 @@
 import { Button } from '@/components/ui/button'
-import { ShoppingBag } from 'lucide-react'
 import React from 'react'
 
-export function OpenCartButton({
-  quantity,
-  iconOnly = false,
-  ...rest
-}: {
+type Props = React.ComponentProps<typeof Button> & {
   quantity?: number
   iconOnly?: boolean
-}) {
-  if (iconOnly) {
-    return (
-      <Button
-        variant="nav"
-        size="clear"
-        className="navLink relative hover:cursor-pointer p-2"
-        {...rest}
-      >
-        <ShoppingBag className="h-5 w-5" />
-        {quantity && quantity > 0 ? (
-          <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
-            {quantity}
-          </span>
-        ) : null}
-      </Button>
-    )
-  }
+}
 
+/** The cart trigger: "Cart" in the nav label style, with the item count when there is one. */
+export function OpenCartButton({ quantity, iconOnly = false, className, ...rest }: Props) {
   return (
     <Button
       variant="nav"
       size="clear"
-      className="navLink relative items-end hover:cursor-pointer"
+      className={
+        iconOnly
+          ? 'navLink relative h-11 items-center gap-1.5 px-2 py-0 hover:cursor-pointer'
+          : 'navLink relative items-end gap-1.5 hover:cursor-pointer'
+      }
       {...rest}
     >
       <span>Cart</span>
-
       {quantity ? (
-        <>
-          <span>•</span>
-          <span>{quantity}</span>
-        </>
+        <span aria-label={`${quantity} ${quantity === 1 ? 'item' : 'items'}`}>{quantity}</span>
       ) : null}
     </Button>
   )

@@ -1,12 +1,11 @@
-import { Grid } from '@/components/Grid'
 import { ProductGridItem } from '@/components/ProductGridItem'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
-import type { Product } from '@/payload-types'
+import { isSoldOut } from '@/components/product/utils'
 
 export const metadata = {
-  description: 'Search for products in the store.',
+  description: 'Limited edition prints by Will M Nichols.',
   title: 'Shop',
 }
 
@@ -32,6 +31,7 @@ export default async function ShopPage({ searchParams }: Props) {
       categories: true,
       priceInUSD: true,
       inventory: true,
+      explicitContent: true,
       enableVariants: true,
       variants: true,
       updatedAt: true,
@@ -51,41 +51,41 @@ export default async function ShopPage({ searchParams }: Props) {
     },
   })
 
-  // Helper function to check if a product is sold out
-  const isSoldOut = (product: Product): boolean => {
-    if (product.enableVariants && product.variants?.docs) {
-      // If using variants, check if all variants are sold out
-      return product.variants.docs.every((variant) => {
-        if (typeof variant === 'object') {
-          return !variant.inventory || variant.inventory === 0
-        }
-        return true
-      })
-    }
-    // If not using variants, check product inventory
-    return !product.inventory || product.inventory === 0
+  // In stock first, sold out last. Array.sort is stable, so the title order holds within each group.
+  const available = products.docs.filter((product) => !isSoldOut(product))
+  const soldOut = products.docs.filter((product) => isSoldOut(product))
+
+  const gridClass = 'grid grid-cols-1 items-start gap-x-12 gap-y-16 md:grid-cols-2 xl:grid-cols-3'
+
+  if (products.docs.length === 0) {
+    return <p className="text-xs uppercase tracking-[0.1em] text-primary/50">No prints available.</p>
   }
 
-  // Sort products: in-stock first, sold-out last
-  const sortedProducts = [...products.docs].sort((a, b) => {
-    const aIsSoldOut = isSoldOut(a)
-    const bIsSoldOut = isSoldOut(b)
-
-    if (aIsSoldOut === bIsSoldOut) return 0
-    return aIsSoldOut ? 1 : -1
-  })
-
   return (
-    <div>
-      {sortedProducts.length === 0 ? (
-        <p className="text-sm uppercase tracking-wider text-primary/50">No prints available.</p>
-      ) : (
-        <Grid className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {sortedProducts.map((product) => {
-            const soldOut = isSoldOut(product)
-            return <ProductGridItem key={product.id} product={product} soldOut={soldOut} />
-          })}
-        </Grid>
+    <div className="flex flex-col gap-24">
+      {available.length > 0 && (
+        <ul className={gridClass}>
+          {available.map((product) => (
+            <li key={product.id}>
+              <ProductGridItem product={product} soldOut={false} />
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {soldOut.length > 0 && (
+        <section aria-labelledby="shop-archive" className="border-t pt-8">
+          <h2 id="shop-archive" className="mb-12 text-xs font-medium uppercase tracking-[0.1em] text-primary/50">
+            Sold out
+          </h2>
+          <ul className={gridClass}>
+            {soldOut.map((product) => (
+              <li key={product.id}>
+                <ProductGridItem product={product} soldOut />
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
     </div>
   )
