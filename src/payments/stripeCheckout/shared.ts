@@ -124,3 +124,25 @@ export const toOrderAddress = (
     country: a?.country ?? null,
   };
 };
+
+/**
+ * The origin this request was served from, so a deployment links back to itself: a preview
+ * returns buyers to that preview, production to the live domain. NEXT_PUBLIC_SERVER_URL is
+ * shared across environments and would send preview buyers to production. On Vercel the
+ * host header is the domain that routed the request, so it is not caller-controlled.
+ */
+export const requestOrigin = (req: { headers: Headers }): string => {
+  const host = (req.headers.get("x-forwarded-host") ?? req.headers.get("host"))
+    ?.split(",")[0]
+    ?.trim();
+  if (host) {
+    const forwardedProto = req.headers
+      .get("x-forwarded-proto")
+      ?.split(",")[0]
+      ?.trim();
+    const local = /^(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/.test(host);
+    const proto = forwardedProto || (local ? "http" : "https");
+    return `${proto}://${host}`;
+  }
+  return process.env.NEXT_PUBLIC_SERVER_URL || "";
+};

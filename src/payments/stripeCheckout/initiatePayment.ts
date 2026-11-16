@@ -5,6 +5,7 @@ import {
   PRINT_TAX_CODE,
   getStripe,
   relationID,
+  requestOrigin,
   toShippingOptions,
   type SnapshotItem,
 } from "./shared";
@@ -112,7 +113,8 @@ export const initiatePayment =
     if (!shippingCountries.length)
       throw new Error("No shipping countries are set in Shop settings.");
 
-    const serverURL = process.env.NEXT_PUBLIC_SERVER_URL || "";
+    // Return the buyer to the deployment they are on (preview or production).
+    const serverURL = requestOrigin(req);
     const cartID = String(cart.id);
 
     try {

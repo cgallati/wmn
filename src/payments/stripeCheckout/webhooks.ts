@@ -1,7 +1,7 @@
 import type { Endpoint, PayloadRequest } from "payload";
 import type Stripe from "stripe";
 
-import { getStripe } from "./shared";
+import { getStripe, requestOrigin } from "./shared";
 
 type Props = { secretKey?: string; webhookSecret?: string };
 
@@ -143,8 +143,8 @@ const settle = async (
     select: { secret: true },
   });
 
-  const serverURL =
-    process.env.NEXT_PUBLIC_SERVER_URL || payload.config.serverURL;
+  // Call back into the deployment Stripe delivered to, not a shared env URL.
+  const serverURL = requestOrigin(req);
   // On a protected Vercel deployment (Previews), a request to our own URL needs the
   // automation bypass secret. Vercel sets this variable when Protection Bypass for
   // Automation is enabled; it is absent locally and in unprotected production.
