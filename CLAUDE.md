@@ -359,11 +359,7 @@ The project is configured for Vercel deployment:
 
 ## Seeding Data
 
-A seed endpoint exists at `/api/seed` (accessible via admin panel "Seed Database" button):
-- Creates demo products, pages, and orders
-- Creates demo customer: `customer@example.com` / `password`
-- **WARNING**: Seeding is destructive and drops existing data
-- Only use when starting fresh or in development
+The template's seed route and demo data were removed: the site holds real content and the seed wiped every content collection. Do not reintroduce an HTTP seed endpoint; use a dev-only script against a local database if fixtures are ever needed.
 
 ## Documentation References
 
