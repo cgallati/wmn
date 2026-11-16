@@ -49,7 +49,10 @@ export const Image: React.FC<MediaProps> = (props) => {
 
     const filename = fullFilename
 
-    src = `${process.env.NEXT_PUBLIC_SERVER_URL}${url}`
+    // Relative, so Next's image optimizer fetches it from this deployment. An absolute URL
+    // breaks on login-protected Vercel Previews: the optimizer's server-side fetch gets
+    // redirected to the login page. Output on production is unchanged.
+    src = url || ''
   }
 
   // NOTE: this is used by the browser to determine which image to download at different screen sizes
