@@ -132,6 +132,8 @@ The palette is achromatic gallery white and ink, with one warning red that is re
 
 **The Whisper Rule.** Anything that is chrome rather than content (nav, filters, quantity, cart, "back") uses the Label style at 50% Graphite and rises to 100% on hover or focus.
 
+**The Decision Rule.** What a buyer must read or choose to buy is content, not chrome: the price, the size choice, print titles and prices on shop tiles, and the cart and checkout totals. These are set in full Ink at Caption size or larger, never at 50%. The size choice is a row of square, Hairline-bordered tiles (min 56px tall) showing each size's price; the chosen tile takes an Ink border. The single filled Ink button stays the one action on each surface (Add to cart, Checkout, Pay), and it is never disabled just because a size is missing: it prompts for one instead.
+
 ## Layout
 
 On desktop (≥1024px) a fixed left rail sits beside the content. The rail is 256px wide, with 24px padding, a 32px gap between the logo and the nav, and a 1px Hairline right edge, and it stays sticky at full height. Content fills the rest of the width. Below 1024px the rail collapses to a fixed 64px top bar (logo left, menu right), and the menu opens as a right-side sheet.
@@ -184,7 +186,7 @@ Warning Red block, white Badge type, 2×6px padding, square, sitting beside the 
 
 ### Do:
 - **Do** keep every image at its true aspect ratio with `object-contain`, on Gallery White or Plinth.
-- **Do** set shop controls (size selector, quantity, cart, filters) in Label style at 50% Graphite. Reserve a single filled Ink button for the one Buy action on a print page.
+- **Do** set shop chrome (quantity, filters, "back", remove) in Label style at 50% Graphite, and purchase decisions (price, size tiles, tile titles and prices, totals) in full Ink per the Decision Rule. Reserve a single filled Ink button for the one buy action on each surface.
 - **Do** present edition, size, paper and number as a wall label: Caption type, label/value rows, Hairline rules.
 - **Do** use Hairline (1px hsl(240 6% 90%)) for every separation, and 0px corners on new elements.
 - **Do** keep sold-out works visible, quietly labeled in Label style, at the end of the list.

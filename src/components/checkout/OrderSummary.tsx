@@ -109,7 +109,7 @@ function Row({
   label: string
 }) {
   return (
-    <div className={cn('flex justify-between gap-4', emphasis && 'pt-3 text-base')}>
+    <div className={cn('flex justify-between gap-4', emphasis && 'border-t pt-4 text-lg font-medium')}>
       <dt className={emphasis ? undefined : 'text-[#525252]'}>{label}</dt>
       <dd>{children}</dd>
     </div>

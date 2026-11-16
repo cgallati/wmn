@@ -23,7 +23,7 @@ const label = 'text-xs font-medium uppercase tracking-[0.1em] text-[#525252]'
 const quietAction =
   'text-xs font-medium uppercase tracking-[0.1em] text-primary/50 outline-none hover:text-primary focus-visible:text-primary focus-visible:underline focus-visible:underline-offset-4'
 const filledButton =
-  'w-full bg-foreground px-8 py-4 text-xs font-medium uppercase tracking-[0.1em] text-background outline-none transition-opacity hover:opacity-85 focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-4 disabled:cursor-not-allowed disabled:opacity-40'
+  'w-full bg-foreground px-8 py-4 text-sm font-medium uppercase tracking-[0.1em] text-background outline-none transition-opacity hover:opacity-85 focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-4 disabled:cursor-not-allowed disabled:opacity-40'
 
 /**
  * Guest checkout on a Stripe Checkout Session (ui_mode: elements). Email first, because the

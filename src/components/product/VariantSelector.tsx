@@ -2,6 +2,7 @@
 
 import type { Product } from '@/payload-types'
 
+import { Price } from '@/components/Price'
 import { createUrl } from '@/utilities/createUrl'
 import { cn } from '@/utilities/cn'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
@@ -33,12 +34,13 @@ export function VariantSelector({ product }: { product: Product }) {
     return (
       <div role="group" aria-labelledby={`variant-type-${type.id}`} key={type.id}>
         <p
-          className="mb-4 text-xs font-medium uppercase tracking-[0.1em] text-primary/50"
+          className="mb-3 text-xs font-medium uppercase tracking-[0.1em] text-[#525252]"
           id={`variant-type-${type.id}`}
         >
           {type.label}
         </p>
-        <div className="flex flex-wrap gap-x-8 gap-y-3">
+        {/* The purchase decision: full-ink tiles with their price, not quiet chrome. */}
+        <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap">
           {options?.map((option) => {
               if (!option || typeof option !== 'object') {
                 return <></>
@@ -61,6 +63,7 @@ export function VariantSelector({ product }: { product: Product }) {
               const currentOptions = Array.from(optionSearchParams.values())
 
               let isAvailableForSale = true
+              let optionPrice: number | null | undefined
 
               // Find a matching variant
               if (variants) {
@@ -79,6 +82,7 @@ export function VariantSelector({ product }: { product: Product }) {
                   })
 
                 if (matchingVariant) {
+                  optionPrice = matchingVariant.priceInUSD
                   // If we found a matching variant, set the variant ID in the search params.
                   optionSearchParams.set('variant', String(matchingVariant.id))
 
@@ -100,14 +104,15 @@ export function VariantSelector({ product }: { product: Product }) {
               return (
                 <button
                   aria-pressed={isActive}
-                  aria-disabled={!isAvailableForSale}
                   className={cn(
-                    'border-b-2 pb-1 text-xs font-medium uppercase tracking-[0.1em] outline-none transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4',
+                    'flex min-h-14 min-w-[8.5rem] flex-col items-start justify-center gap-0.5 border px-4 py-3 text-left outline-none transition-colors focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 motion-reduce:transition-none',
                     isActive
-                      ? 'border-primary text-primary'
-                      : 'border-transparent text-primary/50 hover:text-primary',
-                    !isAvailableForSale && 'cursor-not-allowed text-primary/50 line-through hover:text-primary/50',
+                      ? 'border-foreground ring-1 ring-inset ring-foreground'
+                      : 'border-[hsl(240_6%_90%)] hover:border-foreground',
+                    !isAvailableForSale &&
+                      'cursor-not-allowed border-[hsl(240_6%_90%)] text-primary/50 hover:border-[hsl(240_6%_90%)]',
                   )}
+                  data-size-option
                   disabled={!isAvailableForSale}
                   key={option.id}
                   onClick={() => {
@@ -117,8 +122,14 @@ export function VariantSelector({ product }: { product: Product }) {
                   }}
                   type="button"
                 >
-                  {option.label}
-                  {!isAvailableForSale && <span className="sr-only"> (sold out)</span>}
+                  <span className="text-base font-medium">{option.label}</span>
+                  <span className="text-sm tabular-nums text-[#404040]">
+                    {!isAvailableForSale ? (
+                      'Sold out'
+                    ) : typeof optionPrice === 'number' ? (
+                      <Price as="span" amount={optionPrice} />
+                    ) : null}
+                  </span>
                 </button>
               )
             })}

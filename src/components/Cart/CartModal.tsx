@@ -203,7 +203,7 @@ export function CartModal({ iconOnly = false }: { iconOnly?: boolean }) {
 
               <div className="flex flex-col gap-6 border-t pt-6">
                 {typeof cart?.subtotal === "number" && (
-                  <div className="flex items-baseline justify-between text-sm">
+                  <div className="flex items-baseline justify-between text-base font-medium tabular-nums">
                     <p>Subtotal</p>
                     <Price as="p" amount={cart.subtotal} />
                   </div>
@@ -212,7 +212,7 @@ export function CartModal({ iconOnly = false }: { iconOnly?: boolean }) {
                   Shipping and tax are calculated at checkout.
                 </p>
                 <Link
-                  className="bg-foreground px-8 py-4 text-center text-xs font-medium uppercase tracking-[0.1em] text-background outline-none transition-opacity hover:opacity-85 focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-4"
+                  className="bg-foreground px-8 py-4 text-center text-sm font-medium uppercase tracking-[0.1em] text-background outline-none transition-opacity hover:opacity-85 focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-4"
                   href="/checkout"
                 >
                   Checkout
