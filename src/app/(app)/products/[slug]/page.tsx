@@ -119,7 +119,8 @@ export default async function ProductPage({ params }: Args) {
     <React.Fragment>
       <script
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(productJsonLd),
+          // Escape `<` so text in the CMS can't close the script tag.
+          __html: JSON.stringify(productJsonLd).replace(/</g, '\\u003c'),
         }}
         type="application/ld+json"
       />
