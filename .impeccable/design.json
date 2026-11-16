@@ -1,39 +1,182 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-15T17:00:00-05:00",
+  "generatedAt": "2026-11-15T16:46:54-08:00",
   "title": "Design System: Will M Nichols Photography",
   "extensions": {
     "colorMeta": {
-      "gallery-white": { "role": "neutral", "displayName": "Gallery White", "canonical": "hsl(0 0% 100%)", "tonalRamp": ["oklch(15% 0 0)", "oklch(27% 0 0)", "oklch(39% 0 0)", "oklch(51% 0 0)", "oklch(63% 0 0)", "oklch(75% 0 0)", "oklch(87% 0 0)", "oklch(100% 0 0)"] },
-      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "hsl(222.2 84% 4.9%)", "tonalRamp": ["oklch(15% 0.04 265)", "oklch(26% 0.035 265)", "oklch(37% 0.03 265)", "oklch(48% 0.025 265)", "oklch(60% 0.02 265)", "oklch(72% 0.015 265)", "oklch(84% 0.01 265)", "oklch(95% 0.005 265)"] },
-      "graphite": { "role": "primary", "displayName": "Graphite", "canonical": "hsl(222.2 47.4% 11.2%)", "tonalRamp": ["oklch(15% 0.03 265)", "oklch(26% 0.03 265)", "oklch(37% 0.025 265)", "oklch(48% 0.02 265)", "oklch(60% 0.015 265)", "oklch(72% 0.012 265)", "oklch(84% 0.008 265)", "oklch(95% 0.004 265)"] },
-      "hairline": { "role": "neutral", "displayName": "Hairline", "canonical": "hsl(240 6% 90%)", "tonalRamp": ["oklch(15% 0.005 285)", "oklch(27% 0.005 285)", "oklch(39% 0.005 285)", "oklch(51% 0.005 285)", "oklch(63% 0.005 285)", "oklch(75% 0.005 285)", "oklch(87% 0.005 285)", "oklch(95% 0.003 285)"] },
-      "plinth": { "role": "neutral", "displayName": "Plinth", "canonical": "hsl(210 40% 96.1%)", "tonalRamp": ["oklch(15% 0.01 250)", "oklch(27% 0.01 250)", "oklch(39% 0.01 250)", "oklch(51% 0.01 250)", "oklch(63% 0.01 250)", "oklch(75% 0.01 250)", "oklch(87% 0.008 250)", "oklch(97% 0.006 250)"] },
-      "label-gray": { "role": "neutral", "displayName": "Label Gray", "canonical": "#525252" },
-      "caption-gray": { "role": "neutral", "displayName": "Caption Gray", "canonical": "#404040" },
-      "warning-red": { "role": "tertiary", "displayName": "Warning Red", "canonical": "#dc2626", "tonalRamp": ["oklch(25% 0.1 27)", "oklch(35% 0.14 27)", "oklch(45% 0.18 27)", "oklch(58% 0.22 27)", "oklch(68% 0.17 27)", "oklch(78% 0.11 27)", "oklch(88% 0.06 27)", "oklch(96% 0.02 27)"] }
+      "gallery-white": {
+        "role": "neutral",
+        "displayName": "Gallery White",
+        "canonical": "hsl(0 0% 100%)",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(27% 0 0)",
+          "oklch(39% 0 0)",
+          "oklch(51% 0 0)",
+          "oklch(63% 0 0)",
+          "oklch(75% 0 0)",
+          "oklch(87% 0 0)",
+          "oklch(100% 0 0)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "hsl(222.2 84% 4.9%)",
+        "tonalRamp": [
+          "oklch(15% 0.04 265)",
+          "oklch(26% 0.035 265)",
+          "oklch(37% 0.03 265)",
+          "oklch(48% 0.025 265)",
+          "oklch(60% 0.02 265)",
+          "oklch(72% 0.015 265)",
+          "oklch(84% 0.01 265)",
+          "oklch(95% 0.005 265)"
+        ]
+      },
+      "graphite": {
+        "role": "primary",
+        "displayName": "Graphite",
+        "canonical": "hsl(222.2 47.4% 11.2%)",
+        "tonalRamp": [
+          "oklch(15% 0.03 265)",
+          "oklch(26% 0.03 265)",
+          "oklch(37% 0.025 265)",
+          "oklch(48% 0.02 265)",
+          "oklch(60% 0.015 265)",
+          "oklch(72% 0.012 265)",
+          "oklch(84% 0.008 265)",
+          "oklch(95% 0.004 265)"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "hsl(240 6% 90%)",
+        "tonalRamp": [
+          "oklch(15% 0.005 285)",
+          "oklch(27% 0.005 285)",
+          "oklch(39% 0.005 285)",
+          "oklch(51% 0.005 285)",
+          "oklch(63% 0.005 285)",
+          "oklch(75% 0.005 285)",
+          "oklch(87% 0.005 285)",
+          "oklch(95% 0.003 285)"
+        ]
+      },
+      "plinth": {
+        "role": "neutral",
+        "displayName": "Plinth",
+        "canonical": "hsl(210 40% 96.1%)",
+        "tonalRamp": [
+          "oklch(15% 0.01 250)",
+          "oklch(27% 0.01 250)",
+          "oklch(39% 0.01 250)",
+          "oklch(51% 0.01 250)",
+          "oklch(63% 0.01 250)",
+          "oklch(75% 0.01 250)",
+          "oklch(87% 0.008 250)",
+          "oklch(97% 0.006 250)"
+        ]
+      },
+      "label-gray": {
+        "role": "neutral",
+        "displayName": "Label Gray",
+        "canonical": "#525252"
+      },
+      "caption-gray": {
+        "role": "neutral",
+        "displayName": "Caption Gray",
+        "canonical": "#404040"
+      },
+      "warning-red": {
+        "role": "tertiary",
+        "displayName": "Warning Red",
+        "canonical": "#dc2626",
+        "tonalRamp": [
+          "oklch(25% 0.1 27)",
+          "oklch(35% 0.14 27)",
+          "oklch(45% 0.18 27)",
+          "oklch(58% 0.22 27)",
+          "oklch(68% 0.17 27)",
+          "oklch(78% 0.11 27)",
+          "oklch(88% 0.06 27)",
+          "oklch(96% 0.02 27)"
+        ]
+      }
     },
     "typographyMeta": {
-      "display": { "displayName": "Display", "purpose": "Artwork title on detail pages; one per page." },
-      "title": { "displayName": "Title", "purpose": "Series and year line under a title." },
-      "body": { "displayName": "Body", "purpose": "Descriptions, About text, italic carousel caption." },
-      "caption": { "displayName": "Caption", "purpose": "Wall-label metadata values and mobile captions." },
-      "label": { "displayName": "Label", "purpose": "Nav and all quiet chrome; uppercase, tracked 0.1em, 50% Graphite at rest." },
-      "badge": { "displayName": "Badge", "purpose": "Explicit-content badge only." }
+      "display": {
+        "displayName": "Display",
+        "purpose": "Artwork title on detail pages; one per page."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Series and year line under a title."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Descriptions, About text, italic carousel caption."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Wall-label metadata values and mobile captions."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Nav and all quiet chrome; uppercase, tracked 0.1em, 50% Graphite at rest."
+      },
+      "badge": {
+        "displayName": "Badge",
+        "purpose": "Explicit-content badge only."
+      }
     },
     "shadows": [
-      { "name": "sheet-scrim", "value": "0 0 0 100vmax rgba(0,0,0,0.8)", "purpose": "Mobile menu sheet overlay only; nothing else casts depth." }
+      {
+        "name": "sheet-scrim",
+        "value": "0 0 0 100vmax rgba(0,0,0,0.8)",
+        "purpose": "Mobile menu sheet overlay only; nothing else casts depth."
+      }
     ],
     "motion": [
-      { "name": "nav-underline", "value": "transform 300ms ease", "purpose": "2px underline slides up on nav hover/active." },
-      { "name": "disclosure", "value": "max-height 300ms ease-in-out, opacity 300ms ease-in-out", "purpose": "Nav dropdown expand/collapse." },
-      { "name": "chrome-color", "value": "color 150ms ease", "purpose": "Opacity rise on chrome hover (50% to 100%)." }
+      {
+        "name": "nav-underline",
+        "value": "transform 300ms ease",
+        "purpose": "2px underline slides up on nav hover/active."
+      },
+      {
+        "name": "disclosure",
+        "value": "max-height 300ms ease-in-out, opacity 300ms ease-in-out",
+        "purpose": "Nav dropdown expand/collapse."
+      },
+      {
+        "name": "chrome-color",
+        "value": "color 150ms ease",
+        "purpose": "Opacity rise on chrome hover (50% to 100%)."
+      },
+      {
+        "name": "gate-reveal",
+        "value": "filter 300ms ease-out (disabled under prefers-reduced-motion)",
+        "purpose": "Explicit image un-blurs when the visitor chooses to show it."
+      }
     ],
     "breakpoints": [
-      { "name": "md", "value": "768px" },
-      { "name": "lg", "value": "1024px" },
-      { "name": "xl", "value": "1280px" },
-      { "name": "2xl", "value": "1536px" }
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "xl",
+        "value": "1280px"
+      },
+      {
+        "name": "2xl",
+        "value": "1536px"
+      }
     ]
   },
   "components": [
@@ -67,6 +210,34 @@
       "description": "Bottom-left caption on the fullscreen home carousel.",
       "html": "<p class=\"ds-caption\"><em>Self portrait with veil</em>, 2026</p>",
       "css": ".ds-caption { margin: 0; font-family: neue-haas-grotesk-display, sans-serif; font-size: 16px; line-height: 24px; color: #000; }"
+    },
+    {
+      "name": "Buy Button",
+      "kind": "button",
+      "description": "The one filled control: Add to cart on a print page, Checkout in the cart panel. Square, Ink on white type.",
+      "html": "<button class=\"ds-btn-buy\">Add to cart</button>",
+      "css": ".ds-btn-buy { font-family: neue-haas-grotesk-display, sans-serif; padding: 16px 32px; background: hsl(222.2 84% 4.9%); color: hsl(0 0% 100%); border: 0; border-radius: 0; font-size: 12px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: opacity 150ms ease; } .ds-btn-buy:hover { opacity: 0.85; } .ds-btn-buy:focus-visible { outline: 2px solid hsl(222.2 84% 4.9%); outline-offset: 4px; } .ds-btn-buy:disabled { opacity: 0.4; cursor: not-allowed; }"
+    },
+    {
+      "name": "Size Option",
+      "kind": "chip",
+      "description": "Variant choice as quiet Label text; the selected option takes a 2px Ink underline. Sold-out options are struck through.",
+      "html": "<div class=\"ds-options\"><button class=\"ds-option ds-on\">Small</button><button class=\"ds-option\">Large</button></div>",
+      "css": ".ds-options { display: flex; gap: 32px; } .ds-option { font-family: neue-haas-grotesk-display, sans-serif; padding: 0 0 4px; background: none; border: 0; border-bottom: 2px solid transparent; font-size: 12px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: hsl(222.2 47.4% 11.2% / 0.5); cursor: pointer; transition: color 150ms ease; } .ds-option:hover, .ds-option.ds-on { color: hsl(222.2 47.4% 11.2%); } .ds-option.ds-on { border-bottom-color: hsl(222.2 47.4% 11.2%); } .ds-option:focus-visible { outline: 2px solid hsl(222.2 47.4% 11.2%); outline-offset: 4px; }"
+    },
+    {
+      "name": "Print Tile Label",
+      "kind": "custom",
+      "description": "The single line under a print in the shop: title left, price or Sold out right. No badges, no overlay.",
+      "html": "<a class=\"ds-tile-label\" href=\"#\"><span>Self portrait with veil</span><span>From $0</span></a>",
+      "css": ".ds-tile-label { font-family: neue-haas-grotesk-display, sans-serif; display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-top: 16px; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; color: hsl(222.2 47.4% 11.2% / 0.5); transition: color 150ms ease; } .ds-tile-label:hover, .ds-tile-label:focus-visible { color: hsl(222.2 47.4% 11.2%); }"
+    },
+    {
+      "name": "Explicit Gate Button",
+      "kind": "button",
+      "description": "Sits over a blurred explicit print: a real focusable button, white ground, Label type. No modal, no focus trap.",
+      "html": "<button class=\"ds-gate\"><span>Explicit content</span><span>Show image</span></button>",
+      "css": ".ds-gate { font-family: neue-haas-grotesk-display, sans-serif; display: block; padding: 12px 16px; background: hsl(0 0% 100%); color: hsl(222.2 47.4% 11.2%); border: 0; border-radius: 0; text-align: center; font-size: 12px; font-weight: 500; line-height: 1.3; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; } .ds-gate span:first-child { display: block; opacity: 0.7; } .ds-gate:hover { background: hsl(222.2 47.4% 11.2%); color: hsl(210 40% 98%); } .ds-gate:focus-visible { outline: 2px solid hsl(222.2 47.4% 11.2%); outline-offset: 2px; }"
     }
   ],
   "narrative": {
@@ -80,12 +251,36 @@
       "Fixed left rail on desktop (256px) holding the handwritten \"wmn\" logotype and the nav."
     ],
     "rules": [
-      { "name": "The No Accent Rule", "body": "No brand color exists. Hierarchy comes from size, weight, opacity and space. Do not introduce blue links, green \"in stock\" chips or colored buttons.", "section": "colors" },
-      { "name": "The One Red Rule", "body": "Warning Red means explicit content. Using it for errors, sale prices or \"sold out\" would dilute the one signal it carries; errors use Ink with plain copy.", "section": "colors" },
-      { "name": "The Wall Label Rule", "body": "Facts about a work (year, medium, dimensions, edition, paper) are set in Caption, as a two-column label/value list between Hairline rules. They are never shown as chips, cards or icons.", "section": "typography" },
-      { "name": "The Whisper Rule", "body": "Anything that is chrome rather than content (nav, filters, quantity, cart, \"back\") uses the Label style at 50% Graphite and rises to 100% on hover or focus.", "section": "typography" },
-      { "name": "The Room To Breathe Rule", "body": "Space is the main material. When a layout feels empty, leave it; don't fill it.", "section": "layout" },
-      { "name": "The Flat Wall Rule", "body": "Content never floats. Cards, product tiles and the cart don't lift, glow or cast shadows. Panels separate from the page with a Hairline, not elevation.", "section": "elevation" }
+      {
+        "name": "The No Accent Rule",
+        "body": "No brand color exists. Hierarchy comes from size, weight, opacity and space. Do not introduce blue links, green \"in stock\" chips or colored buttons.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Red Rule",
+        "body": "Warning Red means explicit content. Using it for errors, sale prices or \"sold out\" would dilute the one signal it carries; errors use Ink with plain copy.",
+        "section": "colors"
+      },
+      {
+        "name": "The Wall Label Rule",
+        "body": "Facts about a work (year, medium, dimensions, edition, paper) are set in Caption, as a two-column label/value list between Hairline rules. They are never shown as chips, cards or icons.",
+        "section": "typography"
+      },
+      {
+        "name": "The Whisper Rule",
+        "body": "Anything that is chrome rather than content (nav, filters, quantity, cart, \"back\") uses the Label style at 50% Graphite and rises to 100% on hover or focus.",
+        "section": "typography"
+      },
+      {
+        "name": "The Room To Breathe Rule",
+        "body": "Space is the main material. When a layout feels empty, leave it; don't fill it.",
+        "section": "layout"
+      },
+      {
+        "name": "The Flat Wall Rule",
+        "body": "Content never floats. Cards, product tiles and the cart don't lift, glow or cast shadows. Panels separate from the page with a Hairline, not elevation.",
+        "section": "elevation"
+      }
     ],
     "dos": [
       "Do keep every image at its true aspect ratio with `object-contain`, on Gallery White or Plinth.",
