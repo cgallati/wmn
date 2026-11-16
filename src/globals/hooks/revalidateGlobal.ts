@@ -1,15 +1,18 @@
 import type { GlobalAfterChangeHook } from 'payload'
 
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 
 export const revalidateGlobal: GlobalAfterChangeHook = ({
   doc,
+  global,
   req: { payload, context },
 }) => {
   if (!context.disableRevalidate) {
-    payload.logger.info(`Revalidating homepage due to global change`)
+    payload.logger.info(`Revalidating global_${global.slug} and homepage`)
 
-    // Revalidate homepage when header/footer changes
+    // Header and Footer are read through getCachedGlobal, which caches under this tag on
+    // every page. Without this, CMS nav changes only appear after a redeploy.
+    revalidateTag(`global_${global.slug}`, 'max')
     revalidatePath('/')
   }
   return doc
