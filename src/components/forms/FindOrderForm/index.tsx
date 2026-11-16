@@ -1,14 +1,9 @@
 'use client'
 
-import { FormError } from '@/components/forms/FormError'
-import { FormItem } from '@/components/forms/FormItem'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { useAuth } from '@/providers/Auth'
-import { useRouter } from 'next/navigation'
-import React, { Fragment, useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { sendOrderAccessEmail } from './sendOrderAccessEmail'
 
 type FormData = {
   email: string
@@ -20,8 +15,10 @@ type Props = {
 }
 
 export const FindOrderForm: React.FC<Props> = ({ initialEmail }) => {
-  const router = useRouter()
   const { user } = useAuth()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const [success, setSuccess] = useState(false)
 
   const {
     formState: { errors },
@@ -33,48 +30,113 @@ export const FindOrderForm: React.FC<Props> = ({ initialEmail }) => {
     },
   })
 
-  const onSubmit = useCallback(
-    async (data: FormData) => {
-      router.push(`/orders/${data.orderID}?email=${data.email}`)
-    },
-    [router],
-  )
+  const onSubmit = useCallback(async (data: FormData) => {
+    setIsSubmitting(true)
+    setSubmitError(null)
+
+    try {
+      const result = await sendOrderAccessEmail({
+        email: data.email,
+        orderID: data.orderID,
+      })
+
+      if (result.success) {
+        setSuccess(true)
+      } else {
+        setSubmitError(result.error || 'Something went wrong. Please try again.')
+      }
+    } catch {
+      setSubmitError('Something went wrong. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }, [])
+
+  if (success) {
+    return (
+      <div className="flex max-w-xl flex-col gap-4">
+        <h1 className="text-3xl font-bold tracking-tight md:text-4xl">Check your email</h1>
+        <p className="text-[#404040]">
+          If an order matches that email and order number, a link to it is on its way.
+        </p>
+      </div>
+    )
+  }
 
   return (
-    <Fragment>
-      <h1 className="text-xl mb-4">Find my order</h1>
-      <div className="prose dark:prose-invert mb-8">
-        <p>{`Please enter your email and order ID below.`}</p>
+    <div className="flex max-w-xl flex-col gap-8">
+      <div className="flex flex-col gap-4">
+        <h1 className="text-3xl font-bold tracking-tight md:text-4xl">Find your order</h1>
+        <p className="text-[#404040]">
+          Enter the email you used at checkout and your order number. We&rsquo;ll email you a
+          link to the order.
+        </p>
       </div>
-      <form className="max-w-lg flex flex-col gap-8" onSubmit={handleSubmit(onSubmit)}>
-        <FormItem>
-          <Label htmlFor="email" className="mb-2">
-            Email address
-          </Label>
-          <Input
+      <form className="flex flex-col gap-6" noValidate onSubmit={handleSubmit(onSubmit)}>
+        <Field error={errors.email?.message} id="email" label="Email">
+          <input
+            autoComplete="email"
+            className={inputClass}
             id="email"
-            {...register('email', { required: 'Email is required.' })}
+            {...register('email', { required: 'Enter your email.' })}
+            aria-invalid={Boolean(errors.email)}
             type="email"
           />
-          {errors.email && <FormError message={errors.email.message} />}
-        </FormItem>
-        <FormItem>
-          <Label htmlFor="orderID" className="mb-2">
-            Order ID
-          </Label>
-          <Input
+        </Field>
+        <Field error={errors.orderID?.message} id="orderID" label="Order number">
+          <input
+            className={inputClass}
             id="orderID"
-            {...register('orderID', {
-              required: 'Order ID is required. You can find this in your email.',
-            })}
+            {...register('orderID', { required: 'Enter your order number.' })}
+            aria-invalid={Boolean(errors.orderID)}
             type="text"
           />
-          {errors.orderID && <FormError message={errors.orderID.message} />}
-        </FormItem>
-        <Button type="submit" className="self-start" variant="default">
-          Find my order
-        </Button>
+        </Field>
+        {submitError && (
+          <p className="text-sm" role="alert">
+            {submitError}
+          </p>
+        )}
+        <button
+          className="w-full bg-foreground px-8 py-4 text-xs font-medium uppercase tracking-[0.1em] text-background outline-none transition-opacity hover:opacity-85 focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-4 disabled:cursor-not-allowed disabled:opacity-40 md:w-auto md:self-start"
+          disabled={isSubmitting}
+          type="submit"
+        >
+          {isSubmitting ? 'Sending' : 'Email me the link'}
+        </button>
       </form>
-    </Fragment>
+    </div>
+  )
+}
+
+const inputClass =
+  'border border-[hsl(240_6%_90%)] bg-background px-3 py-3 text-base outline-none focus:border-foreground aria-[invalid=true]:border-foreground'
+
+function Field({
+  children,
+  error,
+  id,
+  label,
+}: {
+  children: React.ReactNode
+  error?: string
+  id: string
+  label: string
+}) {
+  return (
+    <div className="flex flex-col gap-3">
+      <label
+        className="text-xs font-medium uppercase tracking-[0.1em] text-[#525252]"
+        htmlFor={id}
+      >
+        {label}
+      </label>
+      {children}
+      {error ? (
+        <p className="text-sm" id={`${id}-error`} role="alert">
+          {error}
+        </p>
+      ) : null}
+    </div>
   )
 }

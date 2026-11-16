@@ -2,24 +2,21 @@ import type { Order } from '@/payload-types'
 import type { Metadata } from 'next'
 
 import { Price } from '@/components/Price'
-import { Button } from '@/components/ui/button'
 import { formatDateTime } from '@/utilities/formatDateTime'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ChevronLeftIcon } from 'lucide-react'
-import { ProductItem } from '@/components/ProductItem'
 import { headers as getHeaders } from 'next/headers.js'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
-import { OrderStatus } from '@/components/OrderStatus'
-import { AddressItem } from '@/components/addresses/AddressItem'
+import Image from 'next/image'
+import React from 'react'
 
 export const dynamic = 'force-dynamic'
 
 type PageProps = {
   params: Promise<{ id: string }>
-  searchParams: Promise<{ email?: string }>
+  searchParams: Promise<{ email?: string; accessToken?: string }>
 }
 
 export default async function Order({ params, searchParams }: PageProps) {
@@ -28,7 +25,7 @@ export default async function Order({ params, searchParams }: PageProps) {
   const { user } = await payload.auth({ headers })
 
   const { id } = await params
-  const { email = '' } = await searchParams
+  const { email = '', accessToken = '' } = await searchParams
 
   let order: Order | null = null
 
@@ -55,16 +52,22 @@ export default async function Order({ params, searchParams }: PageProps) {
                   },
                 },
               ]
-            : []),
-          ...(email
-            ? [
+            : [
                 {
-                  customerEmail: {
-                    equals: email,
+                  accessToken: {
+                    equals: accessToken,
                   },
                 },
-              ]
-            : []),
+                ...(email
+                  ? [
+                      {
+                        customerEmail: {
+                          equals: email,
+                        },
+                      },
+                    ]
+                  : []),
+              ]),
         ],
       },
       select: {
@@ -83,6 +86,7 @@ export default async function Order({ params, searchParams }: PageProps) {
     const canAccessAsGuest =
       !user &&
       email &&
+      accessToken &&
       orderResult &&
       orderResult.customerEmail &&
       orderResult.customerEmail === email
@@ -105,90 +109,140 @@ export default async function Order({ params, searchParams }: PageProps) {
     notFound()
   }
 
-  return (
-    <div className="">
-      <div className="flex gap-8 justify-between items-center mb-6">
-        {user ? (
-          <div className="flex gap-4">
-            <Button asChild variant="ghost">
-              <Link href="/orders">
-                <ChevronLeftIcon />
-                All orders
-              </Link>
-            </Button>
-          </div>
-        ) : (
-          <div></div>
-        )}
+  const address = order.shippingAddress
+  const addressLines = address
+    ? [
+        [address.firstName, address.lastName].filter(Boolean).join(' '),
+        address.addressLine1,
+        address.addressLine2,
+        [[address.city, address.state].filter(Boolean).join(', '), address.postalCode]
+          .filter(Boolean)
+          .join(' '),
+        address.country,
+      ].filter(Boolean)
+    : []
 
-        <h1 className="text-sm uppercase font-mono px-2 bg-primary/10 rounded tracking-[0.07em]">
-          <span className="">{`Order #${order.id}`}</span>
-        </h1>
+  return (
+    <div className="flex max-w-3xl flex-col gap-12">
+      {user ? (
+        <Link className={quietAction} href="/orders">
+          All orders
+        </Link>
+      ) : null}
+
+      <div className="flex flex-col gap-2">
+        <h1 className="text-3xl font-bold tracking-tight md:text-4xl">Your order</h1>
+        <p className="text-lg text-[#404040]">
+          {order.status === 'processing'
+            ? 'Paid. Your prints are being prepared.'
+            : `Status: ${statusLabel(order.status)}.`}
+        </p>
       </div>
 
-      <div className="bg-card border rounded-lg px-6 py-4 flex flex-col gap-12">
-        <div className="flex flex-col gap-6 lg:flex-row lg:justify-between">
-          <div className="">
-            <p className="font-mono uppercase text-primary/50 mb-1 text-sm">Order Date</p>
-            <p className="text-lg">
-              <time dateTime={order.createdAt}>
-                {formatDateTime({ date: order.createdAt, format: 'MMMM dd, yyyy' })}
-              </time>
-            </p>
-          </div>
+      <dl className="flex flex-col gap-3 border-y py-6 text-sm">
+        <LabelRow label="Order">
+          <span className="break-all">{order.id}</span>
+        </LabelRow>
+        <LabelRow label="Date">
+          <time dateTime={order.createdAt}>
+            {formatDateTime({ date: order.createdAt, format: 'MMMM dd, yyyy' })}
+          </time>
+        </LabelRow>
+        {order.status ? <LabelRow label="Status">{statusLabel(order.status)}</LabelRow> : null}
+        {typeof order.amount === 'number' ? (
+          <LabelRow label="Total paid">
+            <Price as="span" amount={order.amount} />
+          </LabelRow>
+        ) : null}
+        {order.customerEmail ? <LabelRow label="Email">{order.customerEmail}</LabelRow> : null}
+      </dl>
 
-          <div className="">
-            <p className="font-mono uppercase text-primary/50 mb-1 text-sm">Total</p>
-            {order.amount && <Price className="text-lg" amount={order.amount} />}
-          </div>
-
-          {order.status && (
-            <div className="grow max-w-1/3">
-              <p className="font-mono uppercase text-primary/50 mb-1 text-sm">Status</p>
-              <OrderStatus className="text-sm" status={order.status} />
-            </div>
-          )}
-        </div>
-
-        {order.items && (
-          <div>
-            <h2 className="font-mono text-primary/50 mb-4 uppercase text-sm">Items</h2>
-            <ul className="flex flex-col gap-6">
-              {order.items?.map((item, index) => {
-                if (typeof item.product === 'string') {
-                  return null
-                }
-
-                if (!item.product || typeof item.product !== 'object') {
-                  return <div key={index}>This item is no longer available.</div>
-                }
-
-                const variant =
-                  item.variant && typeof item.variant === 'object' ? item.variant : undefined
-
+      {order.items?.length ? (
+        <section aria-labelledby="order-items" className="flex flex-col gap-4">
+          <h2 className={label} id="order-items">
+            Prints
+          </h2>
+          <ul className="flex flex-col">
+            {order.items.map((item, index) => {
+              const product = typeof item.product === 'object' ? item.product : undefined
+              if (!product) {
                 return (
-                  <li key={item.id}>
-                    <ProductItem
-                      product={item.product}
-                      quantity={item.quantity}
-                      variant={variant}
-                    />
+                  <li className="border-t py-4 text-sm text-[#404040]" key={index}>
+                    This print is no longer listed.
                   </li>
                 )
-              })}
-            </ul>
-          </div>
-        )}
+              }
+              const variant = typeof item.variant === 'object' ? item.variant : undefined
+              const options = (variant?.options ?? [])
+                .map((o) => (typeof o === 'object' ? o.label : null))
+                .filter(Boolean)
+                .join(', ')
+              const image =
+                typeof product.gallery?.[0]?.image === 'object'
+                  ? product.gallery[0].image
+                  : undefined
 
-        {order.shippingAddress && (
-          <div>
-            <h2 className="font-mono text-primary/50 mb-4 uppercase text-sm">Shipping Address</h2>
+              return (
+                <li className="flex gap-4 border-t py-4" key={item.id ?? index}>
+                  {image?.url && image.width && image.height ? (
+                    <Image
+                      alt=""
+                      className="h-auto w-16 shrink-0 self-start object-contain"
+                      height={image.height}
+                      sizes="64px"
+                      src={image.url}
+                      width={image.width}
+                    />
+                  ) : null}
+                  <div className="flex flex-col gap-1 text-sm">
+                    <span>{product.title}</span>
+                    {options ? <span className="text-[#404040]">{options}</span> : null}
+                    {item.quantity && item.quantity > 1 ? (
+                      <span className="text-[#404040]">Quantity {item.quantity}</span>
+                    ) : null}
+                  </div>
+                </li>
+              )
+            })}
+          </ul>
+        </section>
+      ) : null}
 
-            {/* @ts-expect-error - some kind of type hell */}
-            <AddressItem address={order.shippingAddress} hideActions />
-          </div>
-        )}
-      </div>
+      {addressLines.length ? (
+        <section aria-labelledby="order-shipping" className="flex flex-col gap-4">
+          <h2 className={label} id="order-shipping">
+            Shipping to
+          </h2>
+          <address className="text-sm not-italic leading-relaxed">
+            {addressLines.map((line, i) => (
+              <span className="block" key={i}>
+                {line}
+              </span>
+            ))}
+          </address>
+        </section>
+      ) : null}
+    </div>
+  )
+}
+
+const label = 'text-xs font-medium uppercase tracking-[0.1em] text-[#525252]'
+const quietAction =
+  'text-xs font-medium uppercase tracking-[0.1em] text-primary/50 outline-none hover:text-primary focus-visible:text-primary focus-visible:underline focus-visible:underline-offset-4'
+
+const statusLabel = (status: Order['status']) =>
+  ({
+    processing: 'Processing',
+    completed: 'Completed',
+    cancelled: 'Cancelled',
+    refunded: 'Refunded',
+  })[status ?? 'processing'] ?? 'Processing'
+
+function LabelRow({ children, label }: { children: React.ReactNode; label: string }) {
+  return (
+    <div className="grid grid-cols-3 gap-4">
+      <dt className="text-[#525252]">{label}</dt>
+      <dd className="col-span-2">{children}</dd>
     </div>
   )
 }
@@ -198,6 +252,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     description: `Order details for order ${id}.`,
+    robots: { index: false },
     openGraph: mergeOpenGraph({
       title: `Order ${id}`,
       url: `/orders/${id}`,

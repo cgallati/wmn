@@ -4,14 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a photography portfolio and ecommerce site built on Payload CMS 3.0 with Next.js 15. The project is a second iteration, migrating from a custom implementation to using Payload's native ecommerce plugin. The goal is to recreate the portfolio functionality from the archived project (`../archive/wmn`) while leveraging the framework's built-in ecommerce capabilities for selling limited edition prints.
+This is a photography portfolio and ecommerce site built on Payload CMS 3.93 with Next.js 16. The project is a second iteration, migrating from a custom implementation to using Payload's native ecommerce plugin. The goal is to recreate the portfolio functionality from the archived project (`../archive/wmn`) while leveraging the framework's built-in ecommerce capabilities for selling limited edition prints.
 
 **Key requirement**: Products (limited edition prints) should display sold-out items at the end of the shop in a sold-out state when their inventory count reaches zero.
 
 ## Tech Stack
 
-- **CMS**: Payload CMS 3.0 with ecommerce plugin
-- **Frontend**: Next.js 15 with App Router, React 19
+- **CMS**: Payload CMS 3.93 with ecommerce plugin
+- **Frontend**: Next.js 16 (Turbopack) with App Router, React 19
 - **Database**: MongoDB Atlas (via `@payloadcms/db-mongodb`)
 - **Storage**: Vercel Blob Storage for media
 - **Styling**: Tailwind CSS 4.x with shadcn/ui components
@@ -25,7 +25,7 @@ This is a photography portfolio and ecommerce site built on Payload CMS 3.0 with
 # Install dependencies
 pnpm install
 
-# Development (DON'T RUN - user manages dev server)
+# Development (run on a free port against a throwaway DB; see Dev Servers below)
 # pnpm dev
 
 # Build for production
@@ -52,8 +52,15 @@ pnpm stripe-webhooks
 
 ## Important Development Notes
 
-### DO NOT Run Dev Servers
-The user often has their own dev server running. DO NOT run `pnpm dev` or any dev server commands. Instead, instruct the user to run/restart their dev server when needed and test changes themselves.
+### Dev Servers
+Run a dev server to validate UI changes for runtime errors before handing off for human review. A clean `tsc` and `next build` do not catch runtime errors. The user often has their own server on port 3000, so follow these rules:
+
+- Check which ports are in use first, and start yours on a free one (for example `pnpm dev -p 3100`). Never stop or restart the user's server.
+- Point it at a throwaway Docker Mongo with dummy env values, never the real database. Use placeholder fixtures only, and stop the container when done.
+- Run it in the background. Check the server log and the browser console for errors, load the changed routes, and report what you saw.
+- Next 16 allows one dev server per project directory. If the user's server is already running from this directory, do not stop it. Build with throwaway env and serve the build with `next start -p <free port>`. In production mode Next blocks optimizing images from localhost, so for local validation only, temporarily set `images.dangerouslyAllowLocalIP: true` in `next.config.js` and revert it before committing.
+- Create fixtures through the REST API (`/api/users/first-register`, `/api/media`, `/api/products`, `/api/variants`), not against the real database.
+- Stop your server when finished.
 
 ### Port Conflicts
 Always check which ports are in use before suggesting any server commands, as the user's dev server may already be running on port 3000.
@@ -359,11 +366,7 @@ The project is configured for Vercel deployment:
 
 ## Seeding Data
 
-A seed endpoint exists at `/api/seed` (accessible via admin panel "Seed Database" button):
-- Creates demo products, pages, and orders
-- Creates demo customer: `customer@example.com` / `password`
-- **WARNING**: Seeding is destructive and drops existing data
-- Only use when starting fresh or in development
+The template's seed route and demo data were removed: the site holds real content and the seed wiped every content collection. Do not reintroduce an HTTP seed endpoint; use a dev-only script against a local database if fixtures are ever needed.
 
 ## Documentation References
 

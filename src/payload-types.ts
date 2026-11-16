@@ -87,6 +87,7 @@ export interface Config {
     carts: Cart;
     orders: Order;
     transactions: Transaction;
+    'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -120,6 +121,7 @@ export interface Config {
     carts: CartsSelect<false> | CartsSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
     transactions: TransactionsSelect<false> | TransactionsSelect<true>;
+    'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -127,18 +129,22 @@ export interface Config {
   db: {
     defaultIDType: string;
   };
+  fallbackLocale: null;
   globals: {
     header: Header;
     footer: Footer;
+    shopSettings: ShopSetting;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
+    shopSettings: ShopSettingsSelect<false> | ShopSettingsSelect<true>;
   };
   locale: null;
-  user: User & {
-    collection: 'users';
+  widgets: {
+    collections: CollectionsWidget;
   };
+  user: User;
   jobs: {
     tasks: unknown;
     workflows: unknown;
@@ -208,6 +214,7 @@ export interface User {
   resetPasswordExpiration?: string | null;
   salt?: string | null;
   hash?: string | null;
+  resetPasswordRequestedAt?: string | null;
   loginAttempts?: number | null;
   lockUntil?: string | null;
   sessions?:
@@ -218,6 +225,7 @@ export interface User {
       }[]
     | null;
   password?: string | null;
+  collection: 'users';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -252,6 +260,7 @@ export interface Order {
   status?: OrderStatus;
   amount?: number | null;
   currency?: 'USD' | null;
+  accessToken?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -296,6 +305,28 @@ export interface Product {
   priceInUSDEnabled?: boolean | null;
   priceInUSD?: number | null;
   relatedProducts?: (string | Product)[] | null;
+  /**
+   * Edition size for each size. Set each size variant's inventory to this number.
+   */
+  editionSize?: number | null;
+  /**
+   * Artist's proofs, not offered for sale.
+   */
+  artistProofs?: number | null;
+  paper?: string | null;
+  printProcess?: string | null;
+  /**
+   * Each print is signed by the artist.
+   */
+  signed?: boolean | null;
+  /**
+   * Days from order to shipment.
+   */
+  productionTime?: number | null;
+  /**
+   * Blur this print behind a content notice in the shop until the visitor chooses to view it.
+   */
+  explicitContent?: boolean | null;
   meta?: {
     title?: string | null;
     /**
@@ -840,9 +871,6 @@ export interface Form {
       )[]
     | null;
   submitButtonLabel?: string | null;
-  /**
-   * Choose whether to display an on-page message or redirect to a different page after they submit the form.
-   */
   confirmationType?: ('message' | 'redirect') | null;
   confirmationMessage?: {
     root: {
@@ -862,9 +890,6 @@ export interface Form {
   redirect?: {
     url: string;
   };
-  /**
-   * Send custom emails when the form submits. Use comma separated lists to send the same email to multiple recipients. To reference a value from this form, wrap that field's name with double curly brackets, i.e. {{firstName}}. You can use a wildcard {{*}} to output all data and {{*:table}} to format it as an HTML table in the email.
-   */
   emails?:
     | {
         emailTo?: string | null;
@@ -873,9 +898,6 @@ export interface Form {
         replyTo?: string | null;
         emailFrom?: string | null;
         subject: string;
-        /**
-         * Enter the message that should be sent in this email.
-         */
         message?: {
           root: {
             type: string;
@@ -933,6 +955,7 @@ export interface Transaction {
     | null;
   paymentMethod?: 'stripe' | null;
   stripe?: {
+    checkoutSessionID?: string | null;
     customerID?: string | null;
     paymentIntentID?: string | null;
   };
@@ -949,7 +972,7 @@ export interface Transaction {
     country?: string | null;
     phone?: string | null;
   };
-  status: 'pending' | 'succeeded' | 'failed' | 'cancelled' | 'expired' | 'refunded';
+  status: 'pending' | 'processing' | 'succeeded' | 'failed' | 'cancelled' | 'expired' | 'refunded';
   customer?: (string | null) | User;
   customerEmail?: string | null;
   order?: (string | null) | Order;
@@ -973,6 +996,7 @@ export interface Cart {
         id?: string | null;
       }[]
     | null;
+  secret?: string | null;
   customer?: (string | null) | User;
   purchasedAt?: string | null;
   status?: ('active' | 'purchased' | 'abandoned') | null;
@@ -1058,6 +1082,23 @@ export interface FormSubmission {
     | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-kv".
+ */
+export interface PayloadKv {
+  id: string;
+  key: string;
+  data:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1185,6 +1226,7 @@ export interface UsersSelect<T extends boolean = true> {
   resetPasswordExpiration?: T;
   salt?: T;
   hash?: T;
+  resetPasswordRequestedAt?: T;
   loginAttempts?: T;
   lockUntil?: T;
   sessions?:
@@ -1642,6 +1684,13 @@ export interface ProductsSelect<T extends boolean = true> {
   priceInUSDEnabled?: T;
   priceInUSD?: T;
   relatedProducts?: T;
+  editionSize?: T;
+  artistProofs?: T;
+  paper?: T;
+  printProcess?: T;
+  signed?: T;
+  productionTime?: T;
+  explicitContent?: T;
   meta?:
     | T
     | {
@@ -1670,6 +1719,7 @@ export interface CartsSelect<T extends boolean = true> {
         quantity?: T;
         id?: T;
       };
+  secret?: T;
   customer?: T;
   purchasedAt?: T;
   status?: T;
@@ -1712,6 +1762,7 @@ export interface OrdersSelect<T extends boolean = true> {
   status?: T;
   amount?: T;
   currency?: T;
+  accessToken?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1732,6 +1783,7 @@ export interface TransactionsSelect<T extends boolean = true> {
   stripe?:
     | T
     | {
+        checkoutSessionID?: T;
         customerID?: T;
         paymentIntentID?: T;
       };
@@ -1759,6 +1811,14 @@ export interface TransactionsSelect<T extends boolean = true> {
   currency?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-kv_select".
+ */
+export interface PayloadKvSelect<T extends boolean = true> {
+  key?: T;
+  data?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1861,6 +1921,61 @@ export interface Footer {
   createdAt?: string | null;
 }
 /**
+ * The shop opens on the site once there is at least one shipping rate here and at least one published print with editions left.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "shopSettings".
+ */
+export interface ShopSetting {
+  id: string;
+  /**
+   * Buyers choose one of these at checkout. Shipping is taxed where required; Stripe Tax decides per address.
+   */
+  shippingRates?:
+    | {
+        label: string;
+        /**
+         * In US dollars.
+         */
+        price: number;
+        /**
+         * Shortest delivery estimate, business days.
+         */
+        minDays?: number | null;
+        /**
+         * Longest delivery estimate, business days.
+         */
+        maxDays?: number | null;
+        id?: string | null;
+      }[]
+    | null;
+  shippingCountries: (
+    | 'US'
+    | 'CA'
+    | 'GB'
+    | 'IE'
+    | 'AU'
+    | 'NZ'
+    | 'DE'
+    | 'FR'
+    | 'NL'
+    | 'BE'
+    | 'ES'
+    | 'IT'
+    | 'PT'
+    | 'AT'
+    | 'CH'
+    | 'SE'
+    | 'NO'
+    | 'DK'
+    | 'FI'
+    | 'JP'
+    | 'MX'
+  )[];
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header_select".
  */
@@ -1924,6 +2039,35 @@ export interface FooterSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "shopSettings_select".
+ */
+export interface ShopSettingsSelect<T extends boolean = true> {
+  shippingRates?:
+    | T
+    | {
+        label?: T;
+        price?: T;
+        minDays?: T;
+        maxDays?: T;
+        id?: T;
+      };
+  shippingCountries?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "collections_widget".
+ */
+export interface CollectionsWidget {
+  data?: {
+    [k: string]: unknown;
+  };
+  width: 'full';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

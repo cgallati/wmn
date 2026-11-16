@@ -1,92 +1,129 @@
 'use client'
-import type { Product, Variant } from '@/payload-types'
+import type { Product } from '@/payload-types'
 
-import { RichText } from '@/components/RichText'
 import { AddToCart } from '@/components/Cart/AddToCart'
 import { Price } from '@/components/Price'
-import React, { Suspense } from 'react'
+import { RichText } from '@/components/RichText'
+import { useSearchParams } from 'next/navigation'
+import React, { Suspense, useMemo } from 'react'
 
 import { VariantSelector } from './VariantSelector'
-import { useCurrency } from '@payloadcms/plugin-ecommerce/client/react'
-import { StockIndicator } from '@/components/product/StockIndicator'
+import { getPriceRange, getVariants, hasVariants as productHasVariants, isSoldOut } from './utils'
 
-export function ProductDescription({ product }: { product: Product }) {
-  const { currency } = useCurrency()
-  let amount = 0,
-    lowestAmount = 0,
-    highestAmount = 0
-  const priceField = `priceIn${currency.code}` as keyof Product
-  const hasVariants = product.enableVariants && Boolean(product.variants?.docs?.length)
+type ArtworkRef = { year?: number | null; series?: string | null } | null
 
-  if (hasVariants) {
-    const priceField = `priceIn${currency.code}` as keyof Variant
-    const variantsOrderedByPrice = product.variants?.docs
-      ?.filter((variant) => variant && typeof variant === 'object')
-      .sort((a, b) => {
-        if (
-          typeof a === 'object' &&
-          typeof b === 'object' &&
-          priceField in a &&
-          priceField in b &&
-          typeof a[priceField] === 'number' &&
-          typeof b[priceField] === 'number'
-        ) {
-          return a[priceField] - b[priceField]
+type Row = { label: string; value: React.ReactNode }
+
+function WallLabelRows({ rows }: { rows: Row[] }) {
+  if (!rows.length) return null
+  return (
+    <dl className="flex flex-col gap-3 border-y py-6 text-sm">
+      {rows.map((row) => (
+        <div className="grid grid-cols-3 gap-4" key={row.label}>
+          <dt className="text-[#525252]">{row.label}</dt>
+          <dd className="col-span-2">{row.value}</dd>
+        </div>
+      ))}
+    </dl>
+  )
+}
+
+function Buy({ product }: { product: Product }) {
+  const searchParams = useSearchParams()
+  const variants = getVariants(product)
+  const hasVariants = productHasVariants(product)
+  const soldOut = isSoldOut(product)
+  const { low, high } = getPriceRange(product)
+
+  const selected = useMemo(() => {
+    if (!hasVariants) return undefined
+    const id = searchParams.get('variant')
+    return variants.find((v) => String(v.id) === id)
+  }, [hasVariants, searchParams, variants])
+
+  const remaining = hasVariants ? selected?.inventory : product.inventory
+  const edition = product.editionSize
+
+  const editionText = (() => {
+    if (soldOut) return 'Sold out'
+    if (typeof remaining === 'number' && edition) return `${remaining} of ${edition} remaining`
+    if (typeof remaining === 'number') return `${remaining} remaining`
+    if (edition) return `Edition of ${edition}`
+    return null
+  })()
+
+  const price = hasVariants ? selected?.priceInUSD : product.priceInUSD
+
+  const rows = ([
+    editionText ? { label: 'Edition', value: <span aria-live="polite">{editionText}</span> } : null,
+    product.paper ? { label: 'Paper', value: product.paper } : null,
+    product.printProcess ? { label: 'Process', value: product.printProcess } : null,
+    product.signed ? { label: 'Signed', value: 'Signed by the artist' } : null,
+    typeof product.productionTime === 'number'
+      ? {
+          label: 'Production',
+          value: `${product.productionTime} ${product.productionTime === 1 ? 'day' : 'days'}`,
         }
+      : null,
+  ] as (Row | null)[]).filter((r): r is Row => Boolean(r))
 
-        return 0
-      }) as Variant[]
+  return (
+    <>
+      {hasVariants && !soldOut && (
+        <div className="flex flex-col gap-8">
+          <VariantSelector product={product} />
+        </div>
+      )}
 
-    const lowestVariant = variantsOrderedByPrice[0][priceField]
-    const highestVariant = variantsOrderedByPrice[variantsOrderedByPrice.length - 1][priceField]
-    if (
-      variantsOrderedByPrice &&
-      typeof lowestVariant === 'number' &&
-      typeof highestVariant === 'number'
-    ) {
-      lowestAmount = lowestVariant
-      highestAmount = highestVariant
-    }
-  } else if (product[priceField] && typeof product[priceField] === 'number') {
-    amount = product[priceField]
-  }
+      <WallLabelRows rows={rows} />
+
+      <div className="flex flex-col gap-6">
+        {typeof price === 'number' ? (
+          <Price as="p" amount={price} className="text-lg" />
+        ) : typeof low === 'number' ? (
+          <p className="text-lg">
+            {typeof high === 'number' && high !== low ? 'From ' : null}
+            <Price as="span" amount={low} />
+          </p>
+        ) : null}
+
+        {soldOut ? (
+          <p className="text-xs font-medium uppercase tracking-[0.1em] text-primary/50">
+            This edition is sold out.
+          </p>
+        ) : (
+          <AddToCart product={product} />
+        )}
+      </div>
+    </>
+  )
+}
+
+export function ProductDescription({
+  product,
+  artwork,
+}: {
+  product: Product
+  artwork?: ArtworkRef
+}) {
+  const meta = [artwork?.series, artwork?.year].filter(Boolean).join(', ')
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-4">
-        <h1 className="text-3xl uppercase tracking-tight">{product.title}</h1>
-        <div className="text-xl font-sans">
-          {hasVariants ? (
-            <Price highestAmount={highestAmount} lowestAmount={lowestAmount} />
-          ) : (
-            <Price amount={amount} />
-          )}
-        </div>
+      <div className="flex flex-col gap-2">
+        <h1 className="text-3xl font-bold leading-tight tracking-tight md:text-4xl">
+          {product.title}
+        </h1>
+        {meta ? <p className="text-lg text-[#404040]">{meta}</p> : null}
       </div>
+
+      <Suspense fallback={null}>
+        <Buy product={product} />
+      </Suspense>
 
       {product.description ? (
         <RichText className="prose-sm" data={product.description} enableGutter={false} />
       ) : null}
-
-      {hasVariants && (
-        <div className="pt-4">
-          <Suspense fallback={null}>
-            <VariantSelector product={product} />
-          </Suspense>
-        </div>
-      )}
-
-      <div className="flex items-center justify-between pt-4">
-        <Suspense fallback={null}>
-          <StockIndicator product={product} />
-        </Suspense>
-      </div>
-
-      <div className="flex items-center justify-between">
-        <Suspense fallback={null}>
-          <AddToCart product={product} />
-        </Suspense>
-      </div>
     </div>
   )
 }

@@ -32,8 +32,10 @@
  *      • Price in USD (e.g., Framed: $150, Unframed: $100)
  *      • Save
  *
- * Note: Inventory is tracked at the product level (shared between framed/unframed).
- * When a customer purchases either variant, it decrements the product's inventory count.
+ * Note: Editions are tracked per size. Each size variant carries its own
+ * inventory, set equal to the edition size for that size (artist's proofs are
+ * not sold and are not counted). Products without variants fall back to the
+ * product-level inventory.
  */
 
 import { CallToAction } from '@/blocks/CallToAction/config'
@@ -94,6 +96,7 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
     gallery: true,
     priceInUSD: true,
     inventory: true,
+    explicitContent: true,
     meta: true,
   },
   fields: [
@@ -210,6 +213,73 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
             },
           ],
           label: 'Product Details',
+        },
+        {
+          label: 'Print Details',
+          fields: [
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'editionSize',
+                  type: 'number',
+                  min: 1,
+                  admin: {
+                    width: '50%',
+                    description:
+                      'Edition size for each size. Set each size variant\'s inventory to this number.',
+                  },
+                },
+                {
+                  name: 'artistProofs',
+                  type: 'number',
+                  min: 0,
+                  admin: { width: '50%', description: 'Artist\'s proofs, not offered for sale.' },
+                },
+              ],
+            },
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'paper',
+                  type: 'text',
+                  admin: { width: '50%', placeholder: 'Paper name and weight' },
+                },
+                {
+                  name: 'printProcess',
+                  type: 'text',
+                  admin: { width: '50%', placeholder: 'e.g., archival pigment print' },
+                },
+              ],
+            },
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'signed',
+                  type: 'checkbox',
+                  defaultValue: false,
+                  admin: { width: '50%', description: 'Each print is signed by the artist.' },
+                },
+                {
+                  name: 'productionTime',
+                  type: 'number',
+                  min: 0,
+                  admin: { width: '50%', description: 'Days from order to shipment.' },
+                },
+              ],
+            },
+            {
+              name: 'explicitContent',
+              type: 'checkbox',
+              defaultValue: false,
+              admin: {
+                description:
+                  'Blur this print behind a content notice in the shop until the visitor chooses to view it.',
+              },
+            },
+          ],
         },
         {
           name: 'meta',

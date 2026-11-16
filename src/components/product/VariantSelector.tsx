@@ -1,10 +1,9 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
 import type { Product } from '@/payload-types'
 
 import { createUrl } from '@/utilities/createUrl'
-import clsx from 'clsx'
+import { cn } from '@/utilities/cn'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import React from 'react'
 
@@ -32,11 +31,15 @@ export function VariantSelector({ product }: { product: Product }) {
     }
 
     return (
-      <dl className="" key={type.id}>
-        <dt className="mb-4 text-xs uppercase tracking-wider text-primary/50">{type.label}</dt>
-        <dd className="flex flex-wrap gap-3">
-          <React.Fragment>
-            {options?.map((option) => {
+      <div role="group" aria-labelledby={`variant-type-${type.id}`} key={type.id}>
+        <p
+          className="mb-4 text-xs font-medium uppercase tracking-[0.1em] text-primary/50"
+          id={`variant-type-${type.id}`}
+        >
+          {type.label}
+        </p>
+        <div className="flex flex-wrap gap-x-8 gap-y-3">
+          {options?.map((option) => {
               if (!option || typeof option !== 'object') {
                 return <></>
               }
@@ -95,14 +98,16 @@ export function VariantSelector({ product }: { product: Product }) {
                 searchParams.get(optionKeyLowerCase) === String(optionID)
 
               return (
-                <Button
-                  variant={'ghost'}
+                <button
+                  aria-pressed={isActive}
                   aria-disabled={!isAvailableForSale}
-                  className={clsx('px-4 py-2 uppercase text-xs tracking-wider border', {
-                    'border-primary bg-primary/5 text-primary': isActive,
-                    'border-primary/20 text-primary/50 hover:border-primary/40 hover:text-primary/80': !isActive && isAvailableForSale,
-                    'border-primary/10 text-primary/30': !isAvailableForSale,
-                  })}
+                  className={cn(
+                    'border-b-2 pb-1 text-xs font-medium uppercase tracking-[0.1em] outline-none transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4',
+                    isActive
+                      ? 'border-primary text-primary'
+                      : 'border-transparent text-primary/50 hover:text-primary',
+                    !isAvailableForSale && 'cursor-not-allowed text-primary/50 line-through hover:text-primary/50',
+                  )}
                   disabled={!isAvailableForSale}
                   key={option.id}
                   onClick={() => {
@@ -110,15 +115,15 @@ export function VariantSelector({ product }: { product: Product }) {
                       scroll: false,
                     })
                   }}
-                  title={`${option.label} ${!isAvailableForSale ? ' (Out of Stock)' : ''}`}
+                  type="button"
                 >
                   {option.label}
-                </Button>
+                  {!isAvailableForSale && <span className="sr-only"> (sold out)</span>}
+                </button>
               )
             })}
-          </React.Fragment>
-        </dd>
-      </dl>
+        </div>
+      </div>
     )
   })
 }
