@@ -11,6 +11,8 @@ import { cn } from '@/utilities/cn'
 type Props = {
   product: Partial<Product>
   soldOut?: boolean
+  /** Load eagerly; for tiles above the fold. */
+  priority?: boolean
 }
 
 /**
@@ -18,7 +20,7 @@ type Props = {
  * label line beneath it. Nothing is cropped, badged or overlaid, except the content
  * notice on explicit work.
  */
-export const ProductGridItem: React.FC<Props> = ({ product, soldOut: soldOutProp }) => {
+export const ProductGridItem: React.FC<Props> = ({ product, soldOut: soldOutProp, priority = false }) => {
   const soldOut = soldOutProp ?? isSoldOut(product)
   const image = getFirstImage(product)
   const { low, high } = getPriceRange(product)
@@ -33,6 +35,7 @@ export const ProductGridItem: React.FC<Props> = ({ product, soldOut: soldOutProp
             <Media
               className="relative w-full bg-[hsl(210_40%_96.1%)]"
               imgClassName="h-auto w-full object-contain"
+              priority={priority}
               resource={image}
               size="(min-width: 1280px) 28vw, (min-width: 768px) 42vw, 100vw"
             />

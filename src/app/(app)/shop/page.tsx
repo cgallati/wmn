@@ -68,9 +68,9 @@ export default async function ShopPage({ searchParams }: Props) {
     <div className="flex flex-col gap-24">
       {available.length > 0 && (
         <ul className={gridClass}>
-          {available.map((product) => (
+          {available.map((product, index) => (
             <li key={product.id}>
-              <ProductGridItem product={product} soldOut={false} />
+              <ProductGridItem priority={index < 3} product={product} soldOut={false} />
             </li>
           ))}
         </ul>
