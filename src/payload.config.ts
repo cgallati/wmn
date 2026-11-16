@@ -81,6 +81,7 @@ export default buildConfig({
       ]
     },
   }),
+  // No email adapter yet: order alerts, order lookup and admin password reset are deferred until one exists.
   //email: nodemailerAdapter(),
   endpoints: [],
   globals: [Header, Footer, ShopSettings],

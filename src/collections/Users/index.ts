@@ -2,7 +2,6 @@ import type { CollectionConfig } from 'payload'
 
 import { adminOnly } from '@/access/adminOnly'
 import { adminOnlyFieldAccess } from '@/access/adminOnlyFieldAccess'
-import { publicAccess } from '@/access/publicAccess'
 import { adminOrSelf } from '@/access/adminOrSelf'
 import { checkRole } from '@/access/utilities'
 
@@ -12,7 +11,8 @@ export const Users: CollectionConfig = {
   slug: 'users',
   access: {
     admin: ({ req: { user } }) => checkRole(['admin'], user),
-    create: publicAccess,
+    // No public sign-up: checkout is guest-only and there is no customer account surface.
+    create: adminOnly,
     delete: adminOnly,
     read: adminOrSelf,
     unlock: adminOnly,

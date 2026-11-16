@@ -88,7 +88,7 @@ export const ConfirmOrder: React.FC = () => {
         setState({
           type: 'error',
           message:
-            'Your payment went through, but this page could not show your order. It is being recorded; you don\u2019t need to pay again.',
+            'Your payment went through, but this page could not show your order. It is being recorded and Stripe emails your receipt; you don\u2019t need to pay again.',
         })
       })
   }, [cart, checkoutSessionID, clearCart, confirmOrder, router])
@@ -105,8 +105,8 @@ export const ConfirmOrder: React.FC = () => {
       )}
       {state.type === 'paid-pending' && (
         <p className="text-[#404040]">
-          Your payment went through and your order is being recorded. You don&rsquo;t need to
-          pay again.
+          Your payment went through and your order is being recorded. Stripe emails your
+          receipt; you don&rsquo;t need to pay again.
         </p>
       )}
       {state.type === 'error' && (

@@ -123,19 +123,20 @@ export default async function Order({ params, searchParams }: PageProps) {
     : []
 
   return (
-    <div className="flex max-w-3xl flex-col gap-12">
-      {user ? (
-        <Link className={quietAction} href="/orders">
-          All orders
-        </Link>
-      ) : null}
-
+    // Outside the old (account) group, so this page provides its own container.
+    <div className="container flex max-w-3xl flex-col gap-12 pb-24 pt-16">
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight md:text-4xl">Your order</h1>
         <p className="text-lg text-[#404040]">
           {order.status === 'processing'
             ? 'Paid. Your prints are being prepared.'
             : `Status: ${statusLabel(order.status)}.`}
+        </p>
+        {/* The only email a buyer gets is Stripe's receipt; the site sends none. */}
+        <p className="text-sm text-[#404040]">
+          Stripe emails your receipt
+          {order.customerEmail ? ` to ${order.customerEmail}` : ''}. This page is your order
+          record; keep its link to come back to it.
         </p>
       </div>
 
