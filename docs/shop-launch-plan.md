@@ -55,12 +55,11 @@ What 3.61 → 3.93 gives the shop:
 - **3.79:** `req` passed through the Stripe adapter (transaction safety).
 - **3.84:** **PaymentIntent verified as succeeded before an order is created**, and locale-aware currency formatting.
 
-### Upgrade steps (branch `shop/payload-3.93`)
+### Upgrade steps (on `feat/shop-rework`)
 
-1. **Capture the baseline.** Take Playwright visual-regression goldens of every public page at 390 / 768 / 1440 widths: `/`, `/mfa`, `/cv`, `/about`, and each artwork page. This is how we prove the portfolio didn't change.
-2. Bump all `@payloadcms/*` and `payload` packages to 3.93.0 together. Then update Next to the latest 15.x patch, run `pnpm generate:types` and `pnpm generate:importmap`, and build.
-3. Rerun the goldens. **Zero diffs on public pages is the merge bar.**
-4. **Spike branch `spike/payload-v4`.** Run the codemod, write down every breakage, and estimate the work. Throw the branch away afterwards.
+1. Bump all `@payloadcms/*` and `payload` packages to 3.93.0 together. Then update Next to the latest 15.x patch, run `pnpm generate:types` and `pnpm generate:importmap`, and build.
+2. **Spot-check the portfolio on the Preview deploy** against production: home carousel, `/mfa`, `/cv`, `/about`, one artwork page, desktop and phone. The upgrade is the one step that changes code under every page, so it gets a manual look.
+3. **Spike branch `spike/payload-v4`.** Run the codemod, write down every breakage, and estimate the work. Throw the branch away afterwards.
 
 ### Agent tooling
 
@@ -102,7 +101,7 @@ Ideas to explore in `shape`:
 ### Scope guard
 
 - PRs touch only `src/app/(app)/{shop,products,checkout,find-order,orders,account}/**`, `src/components/{Cart,checkout,product,ProductGridItem,…}`, and new shop-only components.
-- **Rule:** any diff to `Header`, `Footer`, `Portfolio`, `ArtworkDetail`, `blocks/*`, or `[slug]` gets called out in the PR, and the visual goldens must pass.
+- **Rule:** any diff to `Header`, `Footer`, `Portfolio`, `ArtworkDetail`, `blocks/*`, or `[slug]` is out of scope for shop work. If one is unavoidable, call it out in the PR and spot-check the affected pages.
 - Adding a "Shop" nav item is the **one** intentional public-site change. It happens at launch, done by Will in the CMS (Header global), not in code.
 
 ---
@@ -161,7 +160,6 @@ Other checkout pieces:
 
 ## 4. Verification
 
-- **Visual regression:** public pages show zero diffs against the Phase 1 goldens on every PR.
 - **E2E with Playwright, in Stripe test mode:**
   - Guest purchase with a card.
   - Declined card.
