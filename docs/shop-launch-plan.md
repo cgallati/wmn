@@ -59,7 +59,9 @@ What 3.61 → 3.93 gives the shop:
 
 1. Bump all `@payloadcms/*` and `payload` packages to 3.93.0 together. Then update Next to the latest 15.x patch, run `pnpm generate:types` and `pnpm generate:importmap`, and build.
 2. **Spot-check the portfolio on the Preview deploy** against production: home carousel, `/mfa`, `/cv`, `/about`, one artwork page, desktop and phone. The upgrade is the one step that changes code under every page, so it gets a manual look.
-3. **Spike branch `spike/payload-v4`.** Run the codemod, write down every breakage, and estimate the work. Throw the branch away afterwards.
+3. **Payload 4.0: deferred indefinitely** (decided 2026-11-15). Revisit after GA; the codemod spike is not scheduled.
+
+**Done 2026-11-15:** upgraded to Payload 3.93.0 and Next 16.3.3 (Turbopack). Ported the template's security fixes: ecommerce access rework, admin-only form submissions, order `accessToken` for guest order links, safe preview/login redirects. Made Media and the Header/Footer globals admin-write-only. Stripe webhook path is now `/api/payments/stripe/webhooks`. Find-order emails need an email adapter before launch.
 
 ### Agent tooling
 

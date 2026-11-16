@@ -21,6 +21,7 @@ import { EditItemQuantityButton } from './EditItemQuantityButton'
 import { OpenCartButton } from './OpenCart'
 import { Button } from '@/components/ui/button'
 import { Product } from '@/payload-types'
+import type { CartItem } from '@/components/Cart'
 
 export function CartModal({ iconOnly = false }: { iconOnly?: boolean }) {
   const { cart } = useCart()
@@ -60,7 +61,7 @@ export function CartModal({ iconOnly = false }: { iconOnly?: boolean }) {
           <div className="grow flex px-4">
             <div className="flex flex-col justify-between w-full">
               <ul className="grow overflow-auto py-4">
-                {cart?.items?.map((item, i) => {
+                {cart?.items?.map((item: CartItem, i) => {
                   const product = item.product
                   const variant = item.variant
 

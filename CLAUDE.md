@@ -4,14 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a photography portfolio and ecommerce site built on Payload CMS 3.0 with Next.js 15. The project is a second iteration, migrating from a custom implementation to using Payload's native ecommerce plugin. The goal is to recreate the portfolio functionality from the archived project (`../archive/wmn`) while leveraging the framework's built-in ecommerce capabilities for selling limited edition prints.
+This is a photography portfolio and ecommerce site built on Payload CMS 3.93 with Next.js 16. The project is a second iteration, migrating from a custom implementation to using Payload's native ecommerce plugin. The goal is to recreate the portfolio functionality from the archived project (`../archive/wmn`) while leveraging the framework's built-in ecommerce capabilities for selling limited edition prints.
 
 **Key requirement**: Products (limited edition prints) should display sold-out items at the end of the shop in a sold-out state when their inventory count reaches zero.
 
 ## Tech Stack
 
-- **CMS**: Payload CMS 3.0 with ecommerce plugin
-- **Frontend**: Next.js 15 with App Router, React 19
+- **CMS**: Payload CMS 3.93 with ecommerce plugin
+- **Frontend**: Next.js 16 (Turbopack) with App Router, React 19
 - **Database**: MongoDB Atlas (via `@payloadcms/db-mongodb`)
 - **Storage**: Vercel Blob Storage for media
 - **Styling**: Tailwind CSS 4.x with shadcn/ui components

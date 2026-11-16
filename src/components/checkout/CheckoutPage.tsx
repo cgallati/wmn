@@ -20,6 +20,7 @@ import { useAddresses, useCart, usePayments } from '@payloadcms/plugin-ecommerce
 import { CheckoutAddresses } from '@/components/checkout/CheckoutAddresses'
 import { CreateAddressModal } from '@/components/addresses/CreateAddressModal'
 import { Address } from '@/payload-types'
+import type { CartItem } from '@/components/Cart'
 import { Checkbox } from '@/components/ui/checkbox'
 import { AddressItem } from '@/components/addresses/AddressItem'
 import { FormItem } from '@/components/forms/FormItem'
@@ -354,7 +355,7 @@ export const CheckoutPage: React.FC = () => {
       {!cartIsEmpty && (
         <div className="basis-full lg:basis-1/3 lg:pl-8 p-8 border-none bg-primary/5 flex flex-col gap-8 rounded-lg">
           <h2 className="text-3xl font-medium">Your cart</h2>
-          {cart?.items?.map((item, index) => {
+          {cart?.items?.map((item: CartItem, index) => {
             if (typeof item.product === 'object' && item.product) {
               const {
                 product,
