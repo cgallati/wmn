@@ -1,19 +1,19 @@
-'use client'
+"use client";
 
-import { Price } from '@/components/Price'
-import { useCart } from '@payloadcms/plugin-ecommerce/client/react'
-import Image from 'next/image'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import React, { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { Price } from "@/components/Price";
+import { useCart } from "@payloadcms/plugin-ecommerce/client/react";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import React, { useEffect, useId, useMemo, useRef, useState } from "react";
 
-import { DeleteItemButton } from './DeleteItemButton'
-import { EditItemQuantityButton } from './EditItemQuantityButton'
-import { OPEN_CART_EVENT } from './AddToCart'
-import { OpenCartButton } from './OpenCart'
-import type { CartItem } from '@/components/Cart'
+import { DeleteItemButton } from "./DeleteItemButton";
+import { EditItemQuantityButton } from "./EditItemQuantityButton";
+import { OPEN_CART_EVENT } from "./AddToCart";
+import { OpenCartButton } from "./OpenCart";
+import type { CartItem } from "@/components/Cart";
 
-const labelClass = 'text-xs font-medium uppercase tracking-[0.1em]'
+const labelClass = "text-xs font-medium uppercase tracking-[0.1em]";
 
 /**
  * The cart lives in the left rail. Opening it slides a flat panel out beside the rail on
@@ -21,41 +21,44 @@ const labelClass = 'text-xs font-medium uppercase tracking-[0.1em]'
  * visible and reachable, Escape closes it, and focus returns to the trigger.
  */
 export function CartModal({ iconOnly = false }: { iconOnly?: boolean }) {
-  const { cart } = useCart()
-  const [isOpen, setIsOpen] = useState(false)
-  const panelId = useId()
-  const triggerRef = useRef<HTMLButtonElement>(null)
-  const pathname = usePathname()
+  const { cart } = useCart();
+  const [isOpen, setIsOpen] = useState(false);
+  const panelId = useId();
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
     // Close the cart when the route changes.
-    setIsOpen(false)
-  }, [pathname])
+    setIsOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
-    const open = () => setIsOpen(true)
-    window.addEventListener(OPEN_CART_EVENT, open)
-    return () => window.removeEventListener(OPEN_CART_EVENT, open)
-  }, [])
+    const open = () => setIsOpen(true);
+    window.addEventListener(OPEN_CART_EVENT, open);
+    return () => window.removeEventListener(OPEN_CART_EVENT, open);
+  }, []);
 
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen) return;
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setIsOpen(false)
-        triggerRef.current?.focus()
+      if (event.key === "Escape") {
+        setIsOpen(false);
+        triggerRef.current?.focus();
       }
-    }
-    document.addEventListener('keydown', onKeyDown)
-    return () => document.removeEventListener('keydown', onKeyDown)
-  }, [isOpen])
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [isOpen]);
 
   const totalQuantity = useMemo(() => {
-    if (!cart || !cart.items || !cart.items.length) return undefined
-    return cart.items.reduce((quantity, item) => (item.quantity || 0) + quantity, 0)
-  }, [cart])
+    if (!cart || !cart.items || !cart.items.length) return undefined;
+    return cart.items.reduce(
+      (quantity, item) => (item.quantity || 0) + quantity,
+      0,
+    );
+  }, [cart]);
 
-  const items = cart?.items ?? []
+  const items = cart?.items ?? [];
 
   return (
     <>
@@ -79,8 +82,8 @@ export function CartModal({ iconOnly = false }: { iconOnly?: boolean }) {
             <button
               className={`${labelClass} -mr-2 flex h-11 items-center px-2 text-primary/50 outline-none hover:text-primary focus-visible:text-primary focus-visible:underline focus-visible:underline-offset-4`}
               onClick={() => {
-                setIsOpen(false)
-                triggerRef.current?.focus()
+                setIsOpen(false);
+                triggerRef.current?.focus();
               }}
               type="button"
             >
@@ -89,51 +92,64 @@ export function CartModal({ iconOnly = false }: { iconOnly?: boolean }) {
           </div>
 
           {items.length === 0 ? (
-            <p className={`${labelClass} px-6 text-primary/50`}>Your cart is empty.</p>
+            <p className={`${labelClass} px-6 text-primary/50`}>
+              Your cart is empty.
+            </p>
           ) : (
             <div className="flex grow flex-col justify-between px-6 pb-6">
               <ul className="flex flex-col">
                 {items.map((item: CartItem, i) => {
-                  const product = item.product
-                  const variant = item.variant
+                  const product = item.product;
+                  const variant = item.variant;
 
-                  if (typeof product !== 'object' || !item || !product || !product.slug)
-                    return <React.Fragment key={i} />
+                  if (
+                    typeof product !== "object" ||
+                    !item ||
+                    !product ||
+                    !product.slug
+                  )
+                    return <React.Fragment key={i} />;
 
                   const metaImage =
-                    product.meta?.image && typeof product.meta?.image === 'object'
+                    product.meta?.image &&
+                    typeof product.meta?.image === "object"
                       ? product.meta.image
-                      : undefined
+                      : undefined;
 
                   const firstGalleryImage =
-                    typeof product.gallery?.[0]?.image === 'object'
+                    typeof product.gallery?.[0]?.image === "object"
                       ? product.gallery?.[0]?.image
-                      : undefined
+                      : undefined;
 
-                  const image = firstGalleryImage || metaImage
-                  const isVariant = Boolean(variant) && typeof variant === 'object'
-                  const price = isVariant && variant ? variant.priceInUSD : product.priceInUSD
+                  const image = firstGalleryImage || metaImage;
+                  const isVariant =
+                    Boolean(variant) && typeof variant === "object";
+                  const price =
+                    isVariant && variant
+                      ? variant.priceInUSD
+                      : product.priceInUSD;
                   const options =
                     isVariant && variant
                       ? (variant.options ?? [])
-                          .map((option) => (typeof option === 'object' ? option.label : null))
+                          .map((option) =>
+                            typeof option === "object" ? option.label : null,
+                          )
                           .filter(Boolean)
-                          .join(', ')
-                      : ''
-                  const explicit = Boolean(product.explicitContent)
+                          .join(", ")
+                      : "";
 
                   return (
                     <li className="flex gap-4 border-t py-6" key={item.id ?? i}>
                       <Link
                         aria-hidden="true"
-                        className="block w-20 shrink-0 self-start overflow-hidden"
+                        className="block w-20 shrink-0 self-start"
                         href={`/products/${product.slug}`}
                         tabIndex={-1}
                       >
                         {image?.url && image.width && image.height ? (
                           <Image
                             alt=""
-                            className={`h-auto w-full object-contain ${explicit ? 'blur-md' : ''}`}
+                            className="h-auto w-full object-contain"
                             height={image.height}
                             sizes="80px"
                             src={image.url}
@@ -144,19 +160,31 @@ export function CartModal({ iconOnly = false }: { iconOnly?: boolean }) {
 
                       <div className="flex min-w-0 flex-1 flex-col gap-3 text-sm">
                         <div className="flex items-baseline justify-between gap-4">
-                          <Link className="leading-snug hover:underline" href={`/products/${product.slug}`}>
+                          <Link
+                            className="leading-snug hover:underline"
+                            href={`/products/${product.slug}`}
+                          >
                             {product.title}
                           </Link>
-                          {typeof price === 'number' && (
-                            <Price as="span" amount={price} className="whitespace-nowrap" />
+                          {typeof price === "number" && (
+                            <Price
+                              as="span"
+                              amount={price}
+                              className="whitespace-nowrap"
+                            />
                           )}
                         </div>
-                        {options ? <p className="text-[#404040]">{options}</p> : null}
+                        {options ? (
+                          <p className="text-[#404040]">{options}</p>
+                        ) : null}
 
                         <div className="mt-auto flex items-center justify-between">
                           <div className="-ml-2 flex items-center">
                             <EditItemQuantityButton item={item} type="minus" />
-                            <span aria-label={`Quantity ${item.quantity}`} className="w-5 text-center">
+                            <span
+                              aria-label={`Quantity ${item.quantity}`}
+                              className="w-5 text-center"
+                            >
                               {item.quantity}
                             </span>
                             <EditItemQuantityButton item={item} type="plus" />
@@ -165,18 +193,20 @@ export function CartModal({ iconOnly = false }: { iconOnly?: boolean }) {
                         </div>
                       </div>
                     </li>
-                  )
+                  );
                 })}
               </ul>
 
               <div className="flex flex-col gap-6 border-t pt-6">
-                {typeof cart?.subtotal === 'number' && (
+                {typeof cart?.subtotal === "number" && (
                   <div className="flex items-baseline justify-between text-sm">
                     <p>Subtotal</p>
                     <Price as="p" amount={cart.subtotal} />
                   </div>
                 )}
-                <p className="text-sm text-[#404040]">Shipping and tax are calculated at checkout.</p>
+                <p className="text-sm text-[#404040]">
+                  Shipping and tax are calculated at checkout.
+                </p>
                 <Link
                   className="bg-foreground px-8 py-4 text-center text-xs font-medium uppercase tracking-[0.1em] text-background outline-none transition-opacity hover:opacity-85 focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-4"
                   href="/checkout"
@@ -189,5 +219,5 @@ export function CartModal({ iconOnly = false }: { iconOnly?: boolean }) {
         </aside>
       )}
     </>
-  )
+  );
 }
