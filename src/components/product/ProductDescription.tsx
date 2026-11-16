@@ -98,7 +98,7 @@ function Buy({ product }: { product: Product }) {
 
       {soldOut ? (
         <p className="text-sm text-[#404040]">
-          Every edition of this print has sold. It stays here as part of the archive.
+          Every edition of this print has sold.
         </p>
       ) : (
         <div className="flex flex-col gap-5">
