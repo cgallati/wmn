@@ -25,7 +25,7 @@ This is a photography portfolio and ecommerce site built on Payload CMS 3.93 wit
 # Install dependencies
 pnpm install
 
-# Development (DON'T RUN - user manages dev server)
+# Development (run on a free port against a throwaway DB; see Dev Servers below)
 # pnpm dev
 
 # Build for production
@@ -52,8 +52,13 @@ pnpm stripe-webhooks
 
 ## Important Development Notes
 
-### DO NOT Run Dev Servers
-The user often has their own dev server running. DO NOT run `pnpm dev` or any dev server commands. Instead, instruct the user to run/restart their dev server when needed and test changes themselves.
+### Dev Servers
+Run a dev server to validate UI changes for runtime errors before handing off for human review. A clean `tsc` and `next build` do not catch runtime errors. The user often has their own server on port 3000, so follow these rules:
+
+- Check which ports are in use first, and start yours on a free one (for example `pnpm dev -p 3100`). Never stop or restart the user's server.
+- Point it at a throwaway Docker Mongo with dummy env values, never the real database. Use placeholder fixtures only, and stop the container when done.
+- Run it in the background. Check the server log and the browser console for errors, load the changed routes, and report what you saw.
+- Stop your server when finished.
 
 ### Port Conflicts
 Always check which ports are in use before suggesting any server commands, as the user's dev server may already be running on port 3000.
